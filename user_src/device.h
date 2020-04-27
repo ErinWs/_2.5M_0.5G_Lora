@@ -11,6 +11,10 @@
 #define  MD_NBIOT                3     //3.6V  switch unit
 #define  MD_PRODUCT_NAME         MD_NORMAL  //
 
+#define  MD_DIS5                5
+#define  MD_DIS4                4
+#define  MD_DIS_DIG              MD_DIS5
+
 //#define   MD_MODBUS            //modbus rs485 use irc interface,no sleep
 //#define   MD_NO_LCD
 //#define   MD_TEMP		        //temp display line 2
@@ -244,6 +248,7 @@ typedef struct _DEVICE_COMPONENTS
 	long ( *const calc_ad1_ad2_average)(struct _DEVICE_COMPONENTS *const ); //point to calc_signal_period(sensor_comp_t *const this)
 	long ( *const calc_current_press)(struct _DEVICE_COMPONENTS *const ); //point to calc_signal_period(sensor_comp_t *const this)
     long  current_press;  //Yn
+    long  max_press;
 	long  current_press_n_1;//Yn-1
 	long  current_press_n_2;//Yn-2
 

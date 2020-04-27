@@ -958,6 +958,11 @@ static void device_comps_task_handle(void)//Execution interval is 200 ms
 			this->current_press_n_2=this->current_press_n_1;
 			this->current_press_n_1=this->current_press;
 			this->current_press=this->calc_current_press(this);
+			if(this->current_press>this->max_press)
+			{
+                this->max_press=this->current_press;
+                hum_comps.dis_oper_mark._bit.refresh_press_max=1;
+			}
 			pressOverloadReport(this);
 			if(this->current_press>this->calibration_param.y[3])
 			{
@@ -1112,6 +1117,7 @@ device_comps_t device_comps=
 	calc_ad1_ad2_average,//long ( *const calc_ad1_ad2_average)(struct _DEVICE_COMPONENTS *const ); //point to calc_signal_period(sensor_comp_t *const this)
 	calc_current_press,//     unsigned long ( *const calc_current_press)(struct _DEVICE_COMPONENTS *const ); //point to calc_signal_period(sensor_comp_t *const this)
     0,//     long  current_press;  //Yn
+    0,//long  max_press;
     0,//     long  current_press_n_1;//Yn-1
     0,//     long  current_press_n_2;//Yn-2
 

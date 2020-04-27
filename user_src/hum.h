@@ -16,7 +16,7 @@
 #define   MD_22_PIN_LCD_SEG34   SEG34
 #define   MD_23_PIN_LCD_SEG35   SEG35
 
-
+#define   MD_DIS_T1_COMMUNICATION       MD_23_PIN_LCD_SEG35|=0x01
 #define   MD_DIS_T2_KPA                 MD_23_PIN_LCD_SEG35|=0x02
 #define   MD_DIS_T3_PSI                 MD_23_PIN_LCD_SEG35|=0x04
 #define   MD_DIS_T4_BAR                 MD_23_PIN_LCD_SEG35|=0x08
@@ -25,8 +25,14 @@
 #define   MD_DIS_T7_M                   MD_19_PIN_LCD_SEG21|=0x20
 #define   MD_DIS_T8_PA                  MD_19_PIN_LCD_SEG21|=0x80
 #define   MD_DIS_T9_KGF_CM_2            MD_18_PIN_LCD_SEG20|=0x80
-#define   MD_DID_T10_CELSIUS            MD_15_PIN_LCD_SEG17|=0x80
-
+#define   MD_DIS_T10_CELSIUS            MD_15_PIN_LCD_SEG17|=0x80
+#define   MD_DIS_T11_MAX                MD_15_PIN_LCD_SEG17|=0x40
+#define   MD_DIS_T12_MMH2O              MD_15_PIN_LCD_SEG17|=0x20
+#define   MD_DIS_T13_MMHG               MD_15_PIN_LCD_SEG17|=0x10
+#define   MD_DIS_T14_INH2O              MD_13_PIN_LCD_SEG12|=0x40
+#define   MD_DIS_T15_INHG               MD_13_PIN_LCD_SEG12|=0x20
+#define   MD_DIS_T16_V                  MD_13_PIN_LCD_SEG12|=0x10
+#define   MD_DIS_T17_MA                 MD_15_PIN_LCD_SEG17|=0x08
 
 
 
@@ -39,10 +45,21 @@
 #define   MD_DIS_P7_DOT                 MD_10_PIN_LCD_SEG07|=0x80
 #define   MD_DIS_P8_DOT                 MD_12_PIN_LCD_SEG11|=0x80
 #define   MD_DIS_P9_DOT                 MD_16_PIN_LCD_SEG18|=0x80
+#define   MD_DIS_P10_DOT                MD_19_PIN_LCD_SEG21|=0x40
 
 #define   MD_DIS_COL                    MD_13_PIN_LCD_SEG12|=0x80
 
+#define   MD_DIS_D1_BAT                 MD_13_PIN_LCD_SEG12|=0x08
+#define   MD_DIS_D2_BAT                 MD_13_PIN_LCD_SEG12|=0x01
+#define   MD_DIS_D3_BAT                 MD_13_PIN_LCD_SEG12|=0x04
+#define   MD_DIS_D4_BAT                 MD_13_PIN_LCD_SEG12|=0x02
 
+#define   MD_DIS_N1_CSQ                 MD_14_PIN_LCD_SEG16|=0x01
+#define   MD_DIS_N2_CSQ                 MD_14_PIN_LCD_SEG16|=0x02
+#define   MD_DIS_N3_CSQ                 MD_14_PIN_LCD_SEG16|=0x04
+#define   MD_DIS_N4_CSQ                 MD_14_PIN_LCD_SEG16|=0x08
+
+#define   MD_HIDE_T1_COMMUNICATION       MD_23_PIN_LCD_SEG35&=~0x01
 #define   MD_HIDE_T2_KPA                 MD_23_PIN_LCD_SEG35&=~0x02
 #define   MD_HIDE_T3_PSI                 MD_23_PIN_LCD_SEG35&=~0x04
 #define   MD_HIDE_T4_BAR                 MD_23_PIN_LCD_SEG35&=~0x08
@@ -52,9 +69,13 @@
 #define   MD_HIDE_T8_PA                  MD_19_PIN_LCD_SEG21&=~0x80
 #define   MD_HIDE_T9_KGF_CM_2            MD_18_PIN_LCD_SEG20&=~0x80
 #define   MD_HIDE_T10_CELSIUS            MD_15_PIN_LCD_SEG17&=~0x80
-
-
-
+#define   MD_HIDE_T11_MAX                MD_15_PIN_LCD_SEG17&=~0x40
+#define   MD_HIDE_T12_MMH2O              MD_15_PIN_LCD_SEG17&=~0x20
+#define   MD_HIDE_T13_MMHG               MD_15_PIN_LCD_SEG17&=~0x10
+#define   MD_HIDE_T14_INH2O              MD_13_PIN_LCD_SEG12&=~0x40
+#define   MD_HIDE_T15_INHG               MD_13_PIN_LCD_SEG12&=~0x20
+#define   MD_HIDE_T16_V                  MD_13_PIN_LCD_SEG12&=~0x10
+#define   MD_HIDE_T17_MA                 MD_15_PIN_LCD_SEG17&=~0x08
 
 #define   MD_HIDE_P1_DOT                 MD_21_PIN_LCD_SEG23&=~0x08
 #define   MD_HIDE_P2_DOT                 MD_11_PIN_LCD_SEG08&=~0x08
@@ -65,8 +86,22 @@
 #define   MD_HIDE_P7_DOT                 MD_10_PIN_LCD_SEG07&=~0x80
 #define   MD_HIDE_P8_DOT                 MD_12_PIN_LCD_SEG11&=~0x80
 #define   MD_HIDE_P9_DOT                 MD_16_PIN_LCD_SEG18&=~0x80
+#define   MD_HIDE_P10_DOT                MD_19_PIN_LCD_SEG21&=~0x40
 
 #define   MD_HIDE_COL                    MD_13_PIN_LCD_SEG12&=~0x80
+
+#define   MD_HIDE_D1_BAT                 MD_13_PIN_LCD_SEG12&=~0x08
+#define   MD_HIDE_D2_BAT                 MD_13_PIN_LCD_SEG12&=~0x01
+#define   MD_HIDE_D3_BAT                 MD_13_PIN_LCD_SEG12&=~0x04
+#define   MD_HIDE_D4_BAT                 MD_13_PIN_LCD_SEG12&=~0x02
+
+#define   MD_HIDE_N1_CSQ                 MD_14_PIN_LCD_SEG16&=~0x01
+#define   MD_HIDE_N2_CSQ                 MD_14_PIN_LCD_SEG16&=~0x02
+#define   MD_HIDE_N3_CSQ                 MD_14_PIN_LCD_SEG16&=~0x04
+#define   MD_HIDE_N4_CSQ                 MD_14_PIN_LCD_SEG16&=~0x08
+
+
+
 
    
 
@@ -80,28 +115,12 @@
 #define   MD_DIS_R                      20
 
 
-#define   MD_DIS_T1_COMMUNICATION       MD_23_PIN_LCD_SEG35|=0x01
-#define   MD_DIS_D1_BAT                 MD_13_PIN_LCD_SEG12|=0x08
-#define   MD_DIS_D2_BAT                 MD_13_PIN_LCD_SEG12|=0x01
-#define   MD_DIS_D3_BAT                 MD_13_PIN_LCD_SEG12|=0x04
-#define   MD_DIS_D4_BAT                 MD_13_PIN_LCD_SEG12|=0x02
-
-#define   MD_DIS_N1_CSQ                 MD_14_PIN_LCD_SEG16|=0x01
-#define   MD_DIS_N2_CSQ                 MD_14_PIN_LCD_SEG16|=0x02
-#define   MD_DIS_N3_CSQ                 MD_14_PIN_LCD_SEG16|=0x04
-#define   MD_DIS_N4_CSQ                 MD_14_PIN_LCD_SEG16|=0x08
 
 
-#define   MD_HIDE_T1_COMMUNICATION       MD_23_PIN_LCD_SEG35&=~0x01
-#define   MD_HIDE_D1_BAT                 MD_13_PIN_LCD_SEG12&=~0x08
-#define   MD_HIDE_D2_BAT                 MD_13_PIN_LCD_SEG12&=~0x01
-#define   MD_HIDE_D3_BAT                 MD_13_PIN_LCD_SEG12&=~0x04
-#define   MD_HIDE_D4_BAT                 MD_13_PIN_LCD_SEG12&=~0x02
 
-#define   MD_HIDE_N1_CSQ                 MD_14_PIN_LCD_SEG16&=~0x01
-#define   MD_HIDE_N2_CSQ                 MD_14_PIN_LCD_SEG16&=~0x02
-#define   MD_HIDE_N3_CSQ                 MD_14_PIN_LCD_SEG16&=~0x04
-#define   MD_HIDE_N4_CSQ                 MD_14_PIN_LCD_SEG16&=~0x08
+
+
+
 
 #define   MD_FL_VER                      2
 typedef enum  
@@ -178,6 +197,14 @@ typedef struct _HUM_COMPONENTS
 	unsigned char dig2_5;
 	char          dot2_pos;
 
+	unsigned char dig3_0;
+	unsigned char dig3_1;
+	unsigned char dig3_2;
+	unsigned char dig3_3;
+	unsigned char dig3_4;
+	unsigned char dig3_5;
+	char          dot3_pos;
+
     union 
     {
     	unsigned long All;
@@ -188,8 +215,9 @@ typedef struct _HUM_COMPONENTS
                 unsigned char dis1		            :1;
                 unsigned char cur2		            :1;
                 unsigned char dis2                  :1;
-                unsigned char res6                  :1;
-                unsigned char refresh_err_code      :1;
+                unsigned char cur3                  :1;
+                unsigned char dis3                   :1;
+               
                 
                 unsigned char refresh_date		    :1;
                 unsigned char refresh_time		    :1;
@@ -206,6 +234,8 @@ typedef struct _HUM_COMPONENTS
                 unsigned char refresh_press_adc	    :1;//debug mode use
                 unsigned char refresh_temp_adc	    :1;//debug mode use
                 unsigned char test_ok               :1;
+                unsigned char refresh_press_max     :1;
+                unsigned char refresh_err_code      :1;
            
 
     	}_bit;

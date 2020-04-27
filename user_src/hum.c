@@ -48,71 +48,91 @@ static void delay_us(int t)
 
 static void dis_all_unit()
 {
-    MD_DIS_T1_COMMUNICATION;       
-    MD_DIS_T2_KPA;                
-    MD_DIS_T3_PSI;                 
-    MD_DIS_T4_BAR;                
-    MD_DIS_T5_MPA;                 
-    MD_DIS_T6_CELSIUS;            
-    MD_DIS_T7_M ;                 
-    MD_DIS_T8_PA;                  
-    MD_DIS_T9_KGF_CM_2;            
+    MD_DIS_T1_COMMUNICATION;
+    MD_DIS_T2_KPA;
+    MD_DIS_T3_PSI;
+    MD_DIS_T4_BAR;
+     MD_DIS_T5_MPA;
+    MD_DIS_T6_CELSIUS;
+    MD_DIS_T7_M;
+    MD_DIS_T8_PA;
+    MD_DIS_T9_KGF_CM_2;
+    MD_DIS_T10_CELSIUS;
+    MD_DIS_T11_MAX;
+    MD_DIS_T12_MMH2O;
+    MD_DIS_T13_MMHG;
+    MD_DIS_T14_INH2O;
+    MD_DIS_T15_INHG;
+    MD_DIS_T16_V;
+     MD_DIS_T17_MA;
 
-    MD_DIS_D1_BAT;                
-    MD_DIS_D2_BAT;                 
-    MD_DIS_D3_BAT;                 
-    MD_DIS_D4_BAT;                 
 
-    MD_DIS_N1_CSQ;                
-    MD_DIS_N2_CSQ;               
-    MD_DIS_N3_CSQ;                 
-    MD_DIS_N4_CSQ;                
 
-    MD_DIS_P1_DOT;                
-    MD_DIS_P2_DOT;                 
-    MD_DIS_P3_DOT;                
-    MD_DIS_P4_DOT;                 
-    MD_DIS_P5_DOT;                 
-    MD_DIS_P6_DOT;                 
-    MD_DIS_P7_DOT;                 
-    MD_DIS_P8_DOT;                 
-    MD_DIS_P9_DOT;                 
+    MD_DIS_P1_DOT;
+    MD_DIS_P2_DOT;
+    MD_DIS_P3_DOT;
+    MD_DIS_P4_DOT;
+    MD_DIS_P5_DOT;
+    MD_DIS_P6_DOT;
+    MD_DIS_P7_DOT;
+    MD_DIS_P8_DOT;
+    MD_DIS_P9_DOT;
+    MD_DIS_P10_DOT;
 
-    MD_DIS_COL;                    
+    MD_DIS_COL;
+
+    MD_DIS_D1_BAT;
+    MD_DIS_D2_BAT;
+    MD_DIS_D3_BAT;
+    MD_DIS_D4_BAT;
+
+    MD_DIS_N1_CSQ;
+    MD_DIS_N2_CSQ;
+    MD_DIS_N3_CSQ;
+    MD_DIS_N4_CSQ;
+    
 }
 static void hide_all_unit(void)
 {
-    MD_HIDE_T1_COMMUNICATION;       
-    MD_HIDE_T2_KPA;                
-    MD_HIDE_T3_PSI;                 
-    MD_HIDE_T4_BAR;                
-    MD_HIDE_T5_MPA;                 
-    MD_HIDE_T6_CELSIUS;            
-    MD_HIDE_T7_M ;                 
-    MD_HIDE_T8_PA;                  
-    MD_HIDE_T9_KGF_CM_2;            
+    MD_HIDE_T1_COMMUNICATION;
+    MD_HIDE_T2_KPA;
+    MD_HIDE_T3_PSI;
+    MD_HIDE_T4_BAR;
+    MD_HIDE_T5_MPA;
+    MD_HIDE_T6_CELSIUS;
+    MD_HIDE_T7_M;
+    MD_HIDE_T8_PA;
+    MD_HIDE_T9_KGF_CM_2;
+    MD_HIDE_T10_CELSIUS;
+    MD_HIDE_T11_MAX;
+    MD_HIDE_T12_MMH2O;
+    MD_HIDE_T13_MMHG;
+    MD_HIDE_T14_INH2O;
+    MD_HIDE_T15_INHG;
+    MD_HIDE_T16_V;
+    MD_HIDE_T17_MA;
 
-  //MD_HIDE_D1_BAT;                
-    //MD_HIDE_D2_BAT;                 
-  // MD_HIDE_D3_BAT;                 
-  // MD_HIDE_D4_BAT;                 
+//    MD_HIDE_P1_DOT;
+//    MD_HIDE_P2_DOT;
+//    MD_HIDE_P3_DOT;
+//    MD_HIDE_P4_DOT;
+//    MD_HIDE_P5_DOT;
+//    MD_HIDE_P6_DOT;
+//    MD_HIDE_P7_DOT;
+//    MD_HIDE_P8_DOT;
+//    MD_HIDE_P9_DOT;
+//    MD_HIDE_P10_DOT;
+//
+//    MD_HIDE_COL;
 
-   // MD_HIDE_N1_CSQ;                
-   // MD_HIDE_N2_CSQ;               
-   // MD_HIDE_N3_CSQ;                 
-   // MD_HIDE_N4_CSQ;                
-
-    MD_HIDE_P1_DOT;                
-    MD_HIDE_P2_DOT;                 
-    MD_HIDE_P3_DOT;                
-    MD_HIDE_P4_DOT;                 
-    MD_HIDE_P5_DOT;                 
-    MD_HIDE_P6_DOT;                 
-    MD_HIDE_P7_DOT;                 
-    MD_HIDE_P8_DOT;                 
-    MD_HIDE_P9_DOT;                 
-
-    MD_HIDE_COL; 
+    //MD_HIDE_D1_BAT;
+    //MD_HIDE_D2_BAT;
+    //MD_HIDE_D3_BAT;
+    //MD_HIDE_D4_BAT;
+    //MD_HIDE_N1_CSQ;
+    //MD_HIDE_N2_CSQ;
+    //MD_HIDE_N3_CSQ;
+    //MD_HIDE_N4_CSQ;
 
 
 }
@@ -138,6 +158,7 @@ void clr_lcd(void)
 static void MD_DISPLAY_WRITE_D0_0(unsigned char a)	//  D00  H   L 
 {
     MD_09_PIN_LCD_SEG06&=0xf8;
+    MD_HIDE_P10_DOT;
     MD_09_PIN_LCD_SEG06|=hum_comps.SEG_TAB[a]>>4;
    
     MD_20_PIN_LCD_SEG22&=0xf0;
@@ -158,7 +179,7 @@ static void MD_DISPLAY_WRITE_D0_1(unsigned char a)//  D01  H   L
 
 static void MD_DISPLAY_WRITE_D1_0(unsigned char a)	//  D02  H   L 
 {
-    MD_15_PIN_LCD_SEG17&=0xf0;
+    MD_15_PIN_LCD_SEG17&=0xf8;
     MD_15_PIN_LCD_SEG17|=hum_comps.SEG_TAB[a]>>4;
     MD_16_PIN_LCD_SEG18&=0xf0;
     MD_16_PIN_LCD_SEG18|=hum_comps.SEG_TAB[a]&0x0f;
@@ -208,7 +229,7 @@ static void MD_DISPLAY_WRITE_D1_2(unsigned char a)//  D04  H   L
  {
     MD_16_PIN_LCD_SEG18&=0x0f;
     MD_16_PIN_LCD_SEG18|=hum_comps.SEG_TAB[a]&0xf0;
-    if(hum_comps.dot2_pos==1)  MD_16_PIN_LCD_SEG18|=0x80;
+    if(hum_comps.dot2_pos==1)((hum_comps.cursor_2==-1)&&(hum_comps.dis_oper_mark._bit.cur2))?((hum_comps.dis_oper_mark._bit.dis2)?(MD_DIS_P9_DOT) :(MD_HIDE_P9_DOT)):(MD_DIS_P9_DOT);
     MD_14_PIN_LCD_SEG16&=0x0f;
     MD_14_PIN_LCD_SEG16|=hum_comps.SEG_TAB[a]<<4;
  }
@@ -216,7 +237,7 @@ static void MD_DISPLAY_WRITE_D1_2(unsigned char a)//  D04  H   L
  {
     MD_12_PIN_LCD_SEG11&=0x0f;
     MD_12_PIN_LCD_SEG11|=hum_comps.SEG_TAB[a]&0xf0;
-    if(hum_comps.dot2_pos==2)  MD_12_PIN_LCD_SEG11|=0x80;
+   if(hum_comps.dot2_pos==2)((hum_comps.cursor_2==-1)&&(hum_comps.dis_oper_mark._bit.cur2))?((hum_comps.dis_oper_mark._bit.dis2)?(MD_DIS_P8_DOT) :(MD_HIDE_P8_DOT)):(MD_DIS_P8_DOT);
     MD_11_PIN_LCD_SEG08&=0x0f;
     MD_11_PIN_LCD_SEG08|=hum_comps.SEG_TAB[a]<<4;
  }
@@ -224,7 +245,7 @@ static void MD_DISPLAY_WRITE_D1_2(unsigned char a)//  D04  H   L
  {
     MD_10_PIN_LCD_SEG07&=0x0f;
     MD_10_PIN_LCD_SEG07|=hum_comps.SEG_TAB[a]&0xf0;
-    if(hum_comps.dot2_pos==3)  MD_10_PIN_LCD_SEG07|=0x80;
+    if(hum_comps.dot2_pos==3) ((hum_comps.cursor_2==-1)&&(hum_comps.dis_oper_mark._bit.cur2))?((hum_comps.dis_oper_mark._bit.dis2)?(MD_DIS_P7_DOT) :(MD_HIDE_P7_DOT)):(MD_DIS_P7_DOT);
     MD_09_PIN_LCD_SEG06&=0x0f;
     MD_09_PIN_LCD_SEG06|=hum_comps.SEG_TAB[a]<<4;
  }
@@ -232,7 +253,7 @@ static void MD_DISPLAY_WRITE_D1_2(unsigned char a)//  D04  H   L
  {
     MD_20_PIN_LCD_SEG22&=0x0f;
     MD_20_PIN_LCD_SEG22|=hum_comps.SEG_TAB[a]&0xf0;
-    if(hum_comps.dot2_pos==4)  MD_20_PIN_LCD_SEG22|=0x80;
+    if(hum_comps.dot2_pos==4) ((hum_comps.cursor_2==-1)&&(hum_comps.dis_oper_mark._bit.cur2))?((hum_comps.dis_oper_mark._bit.dis2)?(MD_DIS_P6_DOT) :(MD_HIDE_P6_DOT)):(MD_DIS_P6_DOT);
     MD_21_PIN_LCD_SEG23&=0x0f;
     MD_21_PIN_LCD_SEG23|=hum_comps.SEG_TAB[a]<<4;
  }
@@ -240,29 +261,98 @@ static void MD_DISPLAY_WRITE_D1_2(unsigned char a)//  D04  H   L
   {
     MD_22_PIN_LCD_SEG34&=0x0f;
     MD_22_PIN_LCD_SEG34|=hum_comps.SEG_TAB[a]&0xf0;
-    if(hum_comps.dot2_pos==5)  MD_22_PIN_LCD_SEG34|=0x80;
+    if(hum_comps.dot2_pos==5) ((hum_comps.cursor_2==-1)&&(hum_comps.dis_oper_mark._bit.cur2))?((hum_comps.dis_oper_mark._bit.dis2)?(MD_DIS_P5_DOT) :(MD_HIDE_P5_DOT)):(MD_DIS_P5_DOT);
     MD_23_PIN_LCD_SEG35&=0x0f;
     MD_23_PIN_LCD_SEG35|=hum_comps.SEG_TAB[a]<<4;
   }
 
+
+static void MD_DISPLAY_WRITE_D3_0(unsigned char a)  //  D02  H   L 
+ {
+     MD_15_PIN_LCD_SEG17&=0xf8;
+     MD_15_PIN_LCD_SEG17|=hum_comps.SEG_TAB[a]>>4;
+     MD_16_PIN_LCD_SEG18&=0xf0;
+     MD_16_PIN_LCD_SEG18|=hum_comps.SEG_TAB[a]&0x0f;
+     
+     
+ }
+ static void MD_DISPLAY_WRITE_D3_1(unsigned char a)  //  D03  H   L 
+ {
+     MD_17_PIN_LCD_SEG19&=0xf0;
+     MD_17_PIN_LCD_SEG19|=hum_comps.SEG_TAB[a]>>4;
+     if(hum_comps.dot3_pos==1)  MD_17_PIN_LCD_SEG19|=0x08;
+     MD_18_PIN_LCD_SEG20&=0xf0;
+     MD_18_PIN_LCD_SEG20|=hum_comps.SEG_TAB[a]&0x0f;
+ }
+ 
+ static void MD_DISPLAY_WRITE_D3_2(unsigned char a)//  D04  H   L  
+ {
+ 
+     MD_19_PIN_LCD_SEG21&=0xf0;
+     MD_19_PIN_LCD_SEG21|=hum_comps.SEG_TAB[a]>>4;
+     if(hum_comps.dot3_pos==2)  MD_19_PIN_LCD_SEG21|=0x08;
+     MD_12_PIN_LCD_SEG11&=0xf0;
+     MD_12_PIN_LCD_SEG11|=hum_comps.SEG_TAB[a]&0x0f;
+     
+ }
+ 
+                  //  D10  H   L  
+  static void  MD_DISPLAY_WRITE_D3_3(unsigned char a)   
+  {
+     MD_11_PIN_LCD_SEG08&=0xf0;
+     MD_11_PIN_LCD_SEG08|=hum_comps.SEG_TAB[a]>>4;
+     if(hum_comps.dot3_pos==3)  MD_11_PIN_LCD_SEG08|=0x08;
+     MD_10_PIN_LCD_SEG07&=0xf0;
+     MD_10_PIN_LCD_SEG07|=hum_comps.SEG_TAB[a]&0x0f;
+  }
+
+  static void MD_DISPLAY_WRITE_D3_4(unsigned char a)  //  D00  H   L 
+  {
+      MD_09_PIN_LCD_SEG06&=0xf8;
+      MD_HIDE_P10_DOT;
+      MD_09_PIN_LCD_SEG06|=hum_comps.SEG_TAB[a]>>4;
+     if(hum_comps.dot3_pos==4)  MD_DIS_P10_DOT;
+      MD_20_PIN_LCD_SEG22&=0xf0;
+      MD_20_PIN_LCD_SEG22|=hum_comps.SEG_TAB[a]&0x0f;
+   
+  }
+  static void MD_DISPLAY_WRITE_D3_5(unsigned char a)//  D01  H   L 
+  {
+  
+      MD_21_PIN_LCD_SEG23&=0xf0;
+      MD_21_PIN_LCD_SEG23|=hum_comps.SEG_TAB[a]>>4;
+      if(hum_comps.dot3_pos==5)  MD_21_PIN_LCD_SEG23|=0x08;
+      MD_22_PIN_LCD_SEG34&=0xf0;
+      MD_22_PIN_LCD_SEG34|=hum_comps.SEG_TAB[a]&0x0f;
+  }
+  
+
+
+
+static void display_line3_data()//display 3th line data
+{
+    MD_DISPLAY_WRITE_D3_5(hum_comps.dig3_5);
+    MD_DISPLAY_WRITE_D3_4(hum_comps.dig3_4);
+    MD_DISPLAY_WRITE_D3_3(hum_comps.dig3_3);
+    MD_DISPLAY_WRITE_D3_2(hum_comps.dig3_2);
+    MD_DISPLAY_WRITE_D3_1(hum_comps.dig3_1);
+    MD_DISPLAY_WRITE_D3_0(hum_comps.dig3_0);
+  
+
+}
  static void display_line2_data()//display 0th line data
 {
    
        #define MD_DIS_ALL_2_LINE_DATA (MD_DISPLAY_WRITE_D2_5(hum_comps.dig2_5),MD_DISPLAY_WRITE_D2_4(hum_comps.dig2_4),MD_DISPLAY_WRITE_D2_3(hum_comps.dig2_3),MD_DISPLAY_WRITE_D2_2(hum_comps.dig2_2),MD_DISPLAY_WRITE_D2_1(hum_comps.dig2_1),MD_DISPLAY_WRITE_D2_0(hum_comps.dig2_0))
        #define MD_HID_ALL_2_LINE_DATA (MD_DISPLAY_WRITE_D2_5(MD_HIDE_DISP)    ,MD_DISPLAY_WRITE_D2_4(MD_HIDE_DISP)    ,MD_DISPLAY_WRITE_D2_3(MD_HIDE_DISP)    ,MD_DISPLAY_WRITE_D2_2(MD_HIDE_DISP)    ,MD_DISPLAY_WRITE_D2_1(MD_HIDE_DISP)    ,MD_DISPLAY_WRITE_D2_0(MD_HIDE_DISP)    )
-       if(hum_comps.cursor_2>-1)
-       {
-        	((hum_comps.cursor_2==5)&&(hum_comps.dis_oper_mark._bit.cur2))?((hum_comps.dis_oper_mark._bit.dis2)?MD_DISPLAY_WRITE_D2_5(hum_comps.dig2_5):MD_DISPLAY_WRITE_D2_5(MD_HIDE_DISP)):MD_DISPLAY_WRITE_D2_5(hum_comps.dig2_5);
+            ((hum_comps.cursor_2==5)&&(hum_comps.dis_oper_mark._bit.cur2))?((hum_comps.dis_oper_mark._bit.dis2)?MD_DISPLAY_WRITE_D2_5(hum_comps.dig2_5):MD_DISPLAY_WRITE_D2_5(MD_HIDE_DISP)):MD_DISPLAY_WRITE_D2_5(hum_comps.dig2_5);
           	((hum_comps.cursor_2==4)&&(hum_comps.dis_oper_mark._bit.cur2))?((hum_comps.dis_oper_mark._bit.dis2)?MD_DISPLAY_WRITE_D2_4(hum_comps.dig2_4):MD_DISPLAY_WRITE_D2_4(MD_HIDE_DISP)):MD_DISPLAY_WRITE_D2_4(hum_comps.dig2_4);
         	((hum_comps.cursor_2==3)&&(hum_comps.dis_oper_mark._bit.cur2))?((hum_comps.dis_oper_mark._bit.dis2)?MD_DISPLAY_WRITE_D2_3(hum_comps.dig2_3):MD_DISPLAY_WRITE_D2_3(MD_HIDE_DISP)):MD_DISPLAY_WRITE_D2_3(hum_comps.dig2_3);
         	((hum_comps.cursor_2==2)&&(hum_comps.dis_oper_mark._bit.cur2))?((hum_comps.dis_oper_mark._bit.dis2)?MD_DISPLAY_WRITE_D2_2(hum_comps.dig2_2):MD_DISPLAY_WRITE_D2_2(MD_HIDE_DISP)):MD_DISPLAY_WRITE_D2_2(hum_comps.dig2_2);
         	((hum_comps.cursor_2==1)&&(hum_comps.dis_oper_mark._bit.cur2))?((hum_comps.dis_oper_mark._bit.dis2)?MD_DISPLAY_WRITE_D2_1(hum_comps.dig2_1):MD_DISPLAY_WRITE_D2_1(MD_HIDE_DISP)):MD_DISPLAY_WRITE_D2_1(hum_comps.dig2_1);
         	((hum_comps.cursor_2==0)&&(hum_comps.dis_oper_mark._bit.cur2))?((hum_comps.dis_oper_mark._bit.dis2)?MD_DISPLAY_WRITE_D2_0(hum_comps.dig2_0):MD_DISPLAY_WRITE_D2_0(MD_HIDE_DISP)):MD_DISPLAY_WRITE_D2_0(hum_comps.dig2_0);
-        }
-    	else
-    	{
-            ((hum_comps.cursor_2==-1)&&(hum_comps.dis_oper_mark._bit.cur2))?((hum_comps.dis_oper_mark._bit.dis2)?MD_DIS_ALL_2_LINE_DATA                  :MD_HID_ALL_2_LINE_DATA             ):MD_DIS_ALL_2_LINE_DATA;
-        }
+           ((hum_comps.cursor_2==-1)&&(hum_comps.dis_oper_mark._bit.cur2))?((hum_comps.dis_oper_mark._bit.dis2)?MD_DIS_ALL_2_LINE_DATA                  :MD_HID_ALL_2_LINE_DATA             ):MD_DIS_ALL_2_LINE_DATA;
+     
        #undef MD_DIS_ALL_2_LINE_DATA
        #undef MD_HID_ALL_2_LINE_DATA
 }
@@ -271,17 +361,12 @@ static void display_line1_data()//display 1th line data
 {
 	 #define MD_DIS_ALL_1_LINE_DATA (MD_DISPLAY_WRITE_D1_3(hum_comps.dig1_3),MD_DISPLAY_WRITE_D1_2(hum_comps.dig1_2),MD_DISPLAY_WRITE_D1_1(hum_comps.dig1_1),MD_DISPLAY_WRITE_D1_0(hum_comps.dig1_0))
      #define MD_HID_ALL_1_LINE_DATA (MD_DISPLAY_WRITE_D1_3(MD_HIDE_DISP)    ,MD_DISPLAY_WRITE_D1_2(MD_HIDE_DISP)    ,MD_DISPLAY_WRITE_D1_1(MD_HIDE_DISP)    ,MD_DISPLAY_WRITE_D1_0(MD_HIDE_DISP)    )
-     if(hum_comps.cursor_1>-1)
-     {
-    	((hum_comps.cursor_1==3)&&(hum_comps.dis_oper_mark._bit.cur1))?((hum_comps.dis_oper_mark._bit.dis1)?MD_DISPLAY_WRITE_D1_3(hum_comps.dig1_3):MD_DISPLAY_WRITE_D1_3(MD_HIDE_DISP)):MD_DISPLAY_WRITE_D1_3(hum_comps.dig1_3);
+        ((hum_comps.cursor_1==3)&&(hum_comps.dis_oper_mark._bit.cur1))?((hum_comps.dis_oper_mark._bit.dis1)?MD_DISPLAY_WRITE_D1_3(hum_comps.dig1_3):MD_DISPLAY_WRITE_D1_3(MD_HIDE_DISP)):MD_DISPLAY_WRITE_D1_3(hum_comps.dig1_3);
     	((hum_comps.cursor_1==2)&&(hum_comps.dis_oper_mark._bit.cur1))?((hum_comps.dis_oper_mark._bit.dis1)?MD_DISPLAY_WRITE_D1_2(hum_comps.dig1_2):MD_DISPLAY_WRITE_D1_2(MD_HIDE_DISP)):MD_DISPLAY_WRITE_D1_2(hum_comps.dig1_2);
     	((hum_comps.cursor_1==1)&&(hum_comps.dis_oper_mark._bit.cur1))?((hum_comps.dis_oper_mark._bit.dis1)?MD_DISPLAY_WRITE_D1_1(hum_comps.dig1_1):MD_DISPLAY_WRITE_D1_1(MD_HIDE_DISP)):MD_DISPLAY_WRITE_D1_1(hum_comps.dig1_1);
     	((hum_comps.cursor_1==0)&&(hum_comps.dis_oper_mark._bit.cur1))?((hum_comps.dis_oper_mark._bit.dis1)?MD_DISPLAY_WRITE_D1_0(hum_comps.dig1_0):MD_DISPLAY_WRITE_D1_0(MD_HIDE_DISP)):MD_DISPLAY_WRITE_D1_0(hum_comps.dig1_0);
-     }
-     else
-     {
-       ((hum_comps.cursor_1==-1)&&(hum_comps.dis_oper_mark._bit.cur1))?((hum_comps.dis_oper_mark._bit.dis1)?MD_DIS_ALL_1_LINE_DATA                  :MD_HID_ALL_1_LINE_DATA             ):MD_DIS_ALL_1_LINE_DATA;
-     }
+        ((hum_comps.cursor_1==-1)&&(hum_comps.dis_oper_mark._bit.cur1))?((hum_comps.dis_oper_mark._bit.dis1)?MD_DIS_ALL_1_LINE_DATA                  :MD_HID_ALL_1_LINE_DATA             ):MD_DIS_ALL_1_LINE_DATA;
+    
       #undef MD_DIS_ALL_1_LINE_DATA
       #undef MD_HID_ALL_1_LINE_DATA
 }
@@ -290,15 +375,10 @@ static void display_line0_data()//display 1th line data
 {
 	 #define MD_DIS_ALL_0_LINE_DATA (MD_DISPLAY_WRITE_D0_1(hum_comps.dig0_1),MD_DISPLAY_WRITE_D0_0(hum_comps.dig0_0))
      #define MD_HID_ALL_0_LINE_DATA (MD_DISPLAY_WRITE_D0_1(MD_HIDE_DISP)    ,MD_DISPLAY_WRITE_D0_0(MD_HIDE_DISP)    )
-     if(hum_comps.cursor_0>-1)
-     {
-    	((hum_comps.cursor_0==1)&&(hum_comps.dis_oper_mark._bit.cur0))?((hum_comps.dis_oper_mark._bit.dis0)?MD_DISPLAY_WRITE_D0_1(hum_comps.dig0_1):MD_DISPLAY_WRITE_D0_1(MD_HIDE_DISP)):MD_DISPLAY_WRITE_D0_1(hum_comps.dig0_1);
+        ((hum_comps.cursor_0==1)&&(hum_comps.dis_oper_mark._bit.cur0))?((hum_comps.dis_oper_mark._bit.dis0)?MD_DISPLAY_WRITE_D0_1(hum_comps.dig0_1):MD_DISPLAY_WRITE_D0_1(MD_HIDE_DISP)):MD_DISPLAY_WRITE_D0_1(hum_comps.dig0_1);
     	((hum_comps.cursor_0==0)&&(hum_comps.dis_oper_mark._bit.cur0))?((hum_comps.dis_oper_mark._bit.dis0)?MD_DISPLAY_WRITE_D0_0(hum_comps.dig0_0):MD_DISPLAY_WRITE_D0_0(MD_HIDE_DISP)):MD_DISPLAY_WRITE_D0_0(hum_comps.dig0_0);
-     }
-     else
-     {
        ((hum_comps.cursor_0==-1)&&(hum_comps.dis_oper_mark._bit.cur0))?((hum_comps.dis_oper_mark._bit.dis0)?MD_DIS_ALL_0_LINE_DATA                  :MD_HID_ALL_0_LINE_DATA             ):MD_DIS_ALL_0_LINE_DATA;
-     }
+     
       #undef MD_DIS_ALL_1_LINE_DATA
       #undef MD_HID_ALL_1_LINE_DATA
 }
@@ -556,13 +636,15 @@ static void on_long_s_and_j_key()
 
 static void normal_mode_on_s_key()
 {
-	
+     device_comps.max_press=0;
+	 hum_comps.dis_oper_mark._bit.refresh_press_max=1;
 }
 static void normal_mode_on_m_key()
 {
 	mode_comps[hum_comps.current_mode].dis_option++;
 	//mode_comps[hum_comps.current_mode].dis_option%=8;
 	hum_comps.dis_oper_mark.All|=0x0000ff00;
+	hum_comps.dis_oper_mark._bit.refresh_press_max=1;
 	//if(mode_comps[hum_comps.current_mode].dis_option>2)
 	//{
 	 //   hum_comps.dis_oper_mark._bit.cur2=0;
@@ -971,19 +1053,20 @@ static void lora_mode_on_m_key(void)
 
 //////////////START DISPLAY///////////////////////////////
 
-static void hide_zero(unsigned char reserved_num)//Number of digits reserved
+static void hide_zero(unsigned char  *const hi_addr,unsigned char total_width,unsigned char reserved_num)//Number of digits reserved
 {
 	int i=0;
-	unsigned char  *buf=&hum_comps.dig2_5;
-	for(i=0;i<6-reserved_num;i++)
+	unsigned char  *buf=hi_addr;
+	for(i=0;i<total_width-reserved_num;i++)
 	{
-		if(*(buf-i)==0)
+		if(*(buf-i)>0 && *(buf-i)<10)
 		{
-			*(buf-i)=MD_HIDE_DISP;
+			break;
 		}
 		else
 		{
-			break;	
+			*(buf-i)=MD_HIDE_DISP;
+				
 		}
 	}
 }
@@ -1149,12 +1232,12 @@ void display_press(int index)
                             MD_HIDE_T5_MPA;MD_HIDE_T2_KPA;MD_HIDE_T7_M;MD_DIS_T5_MPA;
                             if(device_comps.calibration_param.dot==5)
                             {
-                                 hide_zero(5);
+                                 hide_zero(&hum_comps.dig2_5,6,5);
                                 hum_comps.dot2_pos=4;// 0.0000
                             }
                             else if(device_comps.calibration_param.dot==4)
                             {
-                                 hide_zero(4);
+                                 hide_zero(&hum_comps.dig2_5,6,4);
                                  hum_comps.dot2_pos=3;// 0.000
                             }
 
@@ -1171,7 +1254,7 @@ void display_press(int index)
                             MD_HIDE_T5_MPA;MD_HIDE_T2_KPA;MD_HIDE_T7_M;MD_DIS_T2_KPA;
                             if(device_comps.calibration_param.dot==3)
                             {
-                                 hide_zero(3);
+                                 hide_zero(&hum_comps.dig2_5,6,3);
                                 hum_comps.dot2_pos=2;// 0.00
                             }
                       }
@@ -1187,7 +1270,7 @@ void display_press(int index)
                             MD_HIDE_T5_MPA;MD_HIDE_T2_KPA;MD_HIDE_T7_M;MD_DIS_T7_M;
                             if(device_comps.calibration_param.dot==3)
                             {
-                                 hide_zero(3);
+                                 hide_zero(&hum_comps.dig2_5,6,3);
                                 hum_comps.dot2_pos=2;// 0.00m
                             }
                       }
@@ -1234,12 +1317,12 @@ void display_press(int index)
                              MD_HIDE_T5_MPA;MD_HIDE_T2_KPA;MD_HIDE_T7_M;MD_DIS_T2_KPA;
                             if(device_comps.calibration_param.dot==5)
                             {
-                                 hide_zero(2);
+                                 hide_zero(&hum_comps.dig2_5,6,2);
                                 hum_comps.dot2_pos=1;// 0.0000
                             }
                             else if(device_comps.calibration_param.dot==4)
                             {
-                                 hide_zero(1);
+                                 hide_zero(&hum_comps.dig2_5,6,1);
                                  hum_comps.dot2_pos=0;// 0
                             }
 
@@ -1256,7 +1339,7 @@ void display_press(int index)
                             MD_HIDE_T5_MPA;MD_HIDE_T2_KPA;MD_HIDE_T7_M;MD_DIS_T5_MPA;
                             if(device_comps.calibration_param.dot==3)
                             {
-                                 hide_zero(6);
+                                 hide_zero(&hum_comps.dig2_5,6,6);
                                 hum_comps.dot2_pos=5;// 0.00000
                             }
                       }
@@ -1272,7 +1355,7 @@ void display_press(int index)
                             MD_HIDE_T5_MPA;MD_HIDE_T2_KPA;MD_HIDE_T7_M;MD_DIS_T2_KPA;
                             if(device_comps.calibration_param.dot==3)
                             {
-                                hide_zero(3);
+                                hide_zero(&hum_comps.dig2_5,6,3);
                                 hum_comps.dot2_pos=2;// 0.00m
                             }
                       }
@@ -1325,7 +1408,7 @@ void display_press(int index)
                             hum_comps.dig2_4=num/10000%10;
                             hum_comps.dig2_5=num/100000%10;
                             MD_HIDE_T5_MPA;MD_HIDE_T2_KPA;MD_HIDE_T7_M;MD_DIS_T7_M;
-                            hide_zero(3);
+                            hide_zero(&hum_comps.dig2_5,6,3);
                             hum_comps.dot2_pos=2;// 0.00m
 
                       }
@@ -1341,7 +1424,7 @@ void display_press(int index)
                            MD_HIDE_T5_MPA;MD_HIDE_T2_KPA;MD_HIDE_T7_M;MD_DIS_T7_M;       
                             if(device_comps.calibration_param.dot==3)
                             {
-                                hide_zero(3);
+                                hide_zero(&hum_comps.dig2_5,6,3);
                                 hum_comps.dot2_pos=2;// 0.00m
                             }
                       }
@@ -1357,7 +1440,7 @@ void display_press(int index)
                             MD_HIDE_T5_MPA;MD_HIDE_T2_KPA;MD_HIDE_T7_M;MD_DIS_T5_MPA; 
                             if(device_comps.calibration_param.dot==3)
                             {
-                                hide_zero(6);
+                                hide_zero(&hum_comps.dig2_5,6,6);
                                 hum_comps.dot2_pos=5;// 0.00000
                             }
                       }
@@ -1412,7 +1495,7 @@ void display_temp()//refresh temperature
 {
 	unsigned char dot_pos=0;
 	long num=device_comps.current_temp;
-	 MD_DID_T10_CELSIUS;
+	 MD_DIS_T10_CELSIUS;
 	switch(num<0)
 	{
 		case 1: num=-num;
@@ -1523,11 +1606,142 @@ static long pwr(int n)
     return 1;
 }
 
+static long normal_mode_Mpa_switch(long num,int n,int *dis_dot,int opt,int *dis_opt)
+{
+    long tmp;
+    const int  dot=device_comps.calibration_param.dot-lg(n);    //main  variable dot
+    num=num/n;  //main  variable num
+    switch((opt>4)?(opt=0):(opt)) 
+    {
+         case 0:
+                MD_DIS_T5_MPA;
+                *dis_dot=dot; 
+                *dis_opt=0;
+                break;
+         case 1:
+                MD_DIS_T4_BAR;
+                *dis_dot=dot-1; 
+                *dis_opt=1;
+                break;
+         case 2:
+                *dis_dot=dot-3; 
+                if(*dis_dot>-1)
+                {
+                    tmp=num*145.0377439;
+                    tmp/=1000;
+                    num=tmp;
+                    MD_DIS_T3_PSI;
+                    *dis_opt=2;
+                    break;
+                }
+                 
+         case 3:
+                    *dis_dot=dot-3; 
+                    if(*dis_dot>-1)
+                    {
+                        MD_DIS_T2_KPA;
+                        *dis_opt=3;
+                        break;
+                    }
+                 
+         case 4: 
+                *dis_dot=dot-2; 
+                if(*dis_dot>-1)
+                {
+                    tmp=num*10.19716;
+                    tmp/=100;
+                    num=tmp;
+                    MD_DIS_T9_KGF_CM_2;
+                    *dis_opt=4;
+                    break;
+                }
+               
+         default:
+                  *dis_dot=dot;
+                   MD_DIS_T5_MPA;
+                  *dis_opt=0;
+                   break;
+    }
+    return num;
+ }
+                
+static long normal_mode_Kpa_switch(long num,int n,int *dis_dot,int opt,int *dis_opt)
+{
+    long tmp;
+    const int  dot=device_comps.calibration_param.dot-lg(n);    //main  variable dot
+    num=num/n;  //main  variable num
+    switch((opt>5)?(opt=0):(opt)) 
+    {
+       case 0:
+                MD_DIS_T2_KPA;
+                *dis_dot=dot;
+                *dis_opt=0;
+                break;
+       case 1:
+                MD_DIS_T4_BAR;
+                #if(MD_DIS_DIG==MD_DIS5)
+                    num=num/pwr(dot-2);
+                    *dis_dot=4;
+                #elif(MD_DIS_DIG==MD_DIS4)
+                    num=num/pwr(dot+1-2);
+                    *dis_dot=3;
+                #endif
+                *dis_opt=1;
+                break;
+       case 2:
+                MD_DIS_T3_PSI;
+                num=num*145.0377439/1000;
+                *dis_dot=dot;
+                *dis_opt=2;
+                break;
+       case 3:
+                MD_DIS_T5_MPA;
+               #if(MD_DIS_DIG==MD_DIS5)
+                  num=num/pwr(dot-1);
+                  *dis_dot=4;
+               #elif(MD_DIS_DIG==MD_DIS4)
+                  num=num/pwr(dot+1-1);
+                  *dis_dot=3;
+               #endif
+                 *dis_opt=3;
+                break;
+       case 4: 
+              MD_DIS_T9_KGF_CM_2;
+              num=num*10.19716/100;
+              *dis_dot=dot+1;
+              *dis_opt=4;
+              break;
+       case 5: 
+              
+              *dis_dot=dot-3;
+              if(*dis_dot>-1)
+              {
+                  MD_DIS_T8_PA;
+                   *dis_opt=5;
+                  break; 
+              }
+                    
+       default:
+              
+            MD_DIS_T2_KPA;
+            *dis_dot=dot; 
+            *dis_opt=0;
+            break;
 
-
+    }
+    return num;
+}
 static void normal_mode_display(unsigned char opt)
 {
-
+    
+    int dis_dot;    
+    int dis_opt;
+    long num;
+    #if(MD_DIS_DIG==MD_DIS5)
+    long n=10;
+    #elif(MD_DIS_DIG==MD_DIS4)
+    long n=100;
+    #endif
      //   if(hum_comps.dis_oper_mark._bit.refresh_option)
     //    {
      //       display_opt(opt);
@@ -1537,124 +1751,80 @@ static void normal_mode_display(unsigned char opt)
      
     if(device_comps.calibration_param.is_calibrated)
     {
+       
         if(hum_comps.dis_oper_mark._bit.refresh_press)
         {
            
-           long tmp;
-           long n=10;
-           long num=device_comps.current_press/n;                //main  variable num
-           int  dot=device_comps.calibration_param.dot-lg(n);    //main  variable dot
            hide_all_unit();
            if(device_comps.calibration_param.unit==0)//Mpa
            {
-                switch((opt>4)?(mode_comps[hum_comps.current_mode].dis_option=0):(opt)) 
+                num=normal_mode_Mpa_switch(device_comps.current_press,n,&dis_dot,opt,&dis_opt);
+                hum_comps.dot2_pos=dis_dot;
+                mode_comps[hum_comps.current_mode].dis_option=dis_opt;
+                switch(dis_opt) 
                 {
                     case 0:
                             MD_DIS_T5_MPA;
-                            hum_comps.dot2_pos=dot; 
                             break;
                      case 1:
                             MD_DIS_T4_BAR;
-                            hum_comps.dot2_pos=dot-1; 
                             break;
                      case 2:
-                           
-                            tmp=num*145.0377439;
-                            tmp/=1000;
-                            hum_comps.dot2_pos=dot-3; 
-                           if(hum_comps.dot2_pos>-1)
-                           {
-                                num=tmp;
-                                MD_DIS_T3_PSI;
-                                break;
-                           }
-                             
+                            MD_DIS_T3_PSI;
+                            break;
                      case 3:
-                           
-                           hum_comps.dot2_pos=dot-3; 
-                           if(hum_comps.dot2_pos>-1)
-                           {
-                                MD_DIS_T2_KPA;
-                                mode_comps[hum_comps.current_mode].dis_option=3;
-                                break;
-                           }
-                             
+                            MD_DIS_T2_KPA;
+                            break;
                      case 4: 
                             MD_DIS_T9_KGF_CM_2;
-                            tmp=num*10.19716;
-                            tmp/=100;
-                            hum_comps.dot2_pos=dot-2; 
-                            if(hum_comps.dot2_pos>-1)
-                            {
-                                num=tmp;
-                                mode_comps[hum_comps.current_mode].dis_option=4;
-                                break;
-                            }
                             break;
                      default:
                             mode_comps[hum_comps.current_mode].dis_option=0;
+                            MD_DIS_T5_MPA;
                             break;
                 }             
 
            }
-           else if((device_comps.calibration_param.unit&0x0f)==1)
+           
+           else if((device_comps.calibration_param.unit&0x0f)==1)//Kpa 
            {
-
-                 switch((opt>5)?(mode_comps[hum_comps.current_mode].dis_option=0):(opt)) 
+                num=normal_mode_Kpa_switch(device_comps.current_press,n,&dis_dot,opt,&dis_opt);
+                hum_comps.dot2_pos=dis_dot;
+                mode_comps[hum_comps.current_mode].dis_option=dis_opt;
+                 switch(dis_opt) 
                  {
                       case 0:
                                 MD_DIS_T2_KPA;
-                                hum_comps.dot2_pos=dot; 
                                 break;
                        case 1:
                                 MD_DIS_T4_BAR;
-                                num=num/pwr(dot-2);
-                                hum_comps.dot2_pos=4;
                                 break;
                        case 2:
                                 MD_DIS_T3_PSI;
-                                num=num*145.0377439/1000;
-                                hum_comps.dot2_pos=dot;
                                 break;
                        case 3:
                                 MD_DIS_T5_MPA;
-                                num=num/pwr(dot-1);
-                                hum_comps.dot2_pos=4;
                                 break;
                        case 4: 
-                              MD_DIS_T9_KGF_CM_2;
-                              num=num*10.19716/100;
-                              hum_comps.dot2_pos=dot+1;
-                              if(hum_comps.dot2_pos>4)
-                              {
-                                  num=num/10;
-                                  hum_comps.dot2_pos=dot+1-1;
-
-                              }
-                              break;
+                                MD_DIS_T9_KGF_CM_2;
+                                break;
                         case 5: 
-                              
-                              hum_comps.dot2_pos=dot-3;
-                              if(hum_comps.dot2_pos>-1)
-                              {
-                                  MD_DIS_T8_PA;
-                                  break; 
-                              }
-                                    
-                       default:
-                              mode_comps[hum_comps.current_mode].dis_option=0;
-                              MD_DIS_T2_KPA;
-                              hum_comps.dot2_pos=dot; 
-                              break;
+                                MD_DIS_T8_PA;
+                                break;  
+                        default:
+                                  mode_comps[hum_comps.current_mode].dis_option=0;
+                                  MD_DIS_T2_KPA;
+                                  break;
                  }
           }
-            hum_comps.dig2_0=num%10;
-            hum_comps.dig2_1=num/10%10;
-            hum_comps.dig2_2=num/100%10;
-            hum_comps.dig2_3=num/1000%10;
-            hum_comps.dig2_4=num/10000%10;
-            hum_comps.dig2_5=num/100000%10;
-          hide_zero(hum_comps.dot2_pos+1);
+          
+          hum_comps.dig2_0=num%10;
+          hum_comps.dig2_1=num/10%10;
+          hum_comps.dig2_2=num/100%10;
+          hum_comps.dig2_3=num/1000%10;
+          hum_comps.dig2_4=num/10000%10;
+          hum_comps.dig2_5=num/100000%10;
+          hide_zero(&hum_comps.dig2_5,6,hum_comps.dot2_pos+1);
           hum_comps.dis_oper_mark._bit.refresh_press=0;
        }
        
@@ -1681,7 +1851,8 @@ static void normal_mode_display(unsigned char opt)
                    hum_comps.dis_oper_mark._bit.dis2=1;
                 }
             }
-        }     
+        } 
+
     }    
     else
     {
@@ -1696,11 +1867,48 @@ static void normal_mode_display(unsigned char opt)
         
     }
     display_line2_data();
-	if(hum_comps.dis_oper_mark._bit.refresh_temp)
-	{
-        display_temp();//refresh temperature
-		hum_comps.dis_oper_mark._bit.refresh_temp=0;
-	}
+    
+    if(hum_comps.dis_oper_mark._bit.refresh_press_max&&device_comps.calibration_param.is_calibrated)
+    {
+        if(device_comps.calibration_param.unit==0)//Mpa
+        {
+            num=normal_mode_Mpa_switch(device_comps.max_press,n,&dis_dot,opt,&dis_opt);
+        }
+        else if((device_comps.calibration_param.unit&0x0f)==1)//Kpa 
+        {
+             num=normal_mode_Kpa_switch(device_comps.max_press,n,&dis_dot,opt,&dis_opt);
+        }
+        hum_comps.dot3_pos=dis_dot;
+        if(hum_comps.dot3_pos==4)
+        {
+            hum_comps.dot3_pos+=1;
+            hum_comps.dig3_0=MD_HIDE_DISP;
+            hum_comps.dig3_1=num%10;
+            hum_comps.dig3_2=num/10%10;
+            hum_comps.dig3_3=num/100%10;
+            hum_comps.dig3_4=num/1000%10;
+            hum_comps.dig3_5=num/10000%10;
+        }
+        else
+        {
+            hum_comps.dig3_0=num%10;
+            hum_comps.dig3_1=num/10%10;
+            hum_comps.dig3_2=num/100%10;
+            hum_comps.dig3_3=num/1000%10;
+            hum_comps.dig3_4=num/10000%10;
+            hum_comps.dig3_5=num/100000%10;
+        }
+        MD_DIS_T11_MAX;
+        hide_zero(&hum_comps.dig3_5,6,hum_comps.dot3_pos+1);
+        hum_comps.dis_oper_mark._bit.refresh_press_max=0;
+        display_line3_data();
+    }
+     
+	//if(hum_comps.dis_oper_mark._bit.refresh_temp)
+	//{
+     //   display_temp();//refresh temperature
+		//hum_comps.dis_oper_mark._bit.refresh_temp=0;
+	//}
 	
 	
 }
@@ -1812,7 +2020,7 @@ static void param_query_mode_display(unsigned char opt)
     {
         case 0:  //unit
              hide_all_unit();
-             hide_zero(1);
+             hide_zero(&hum_comps.dig2_5,6,1);
              hum_comps.dot2_pos=0;
              break;
         case 1://Constant_pressure_value
@@ -1896,32 +2104,32 @@ static void param_query_mode_display(unsigned char opt)
                    }
 
                }
-               hide_zero(5);
+               hide_zero(&hum_comps.dig2_5,6,5);
                break;
          case 3://buck_percent
                hide_all_unit();
                hum_comps.dot2_pos=1;
-               hide_zero(3);
+               hide_zero(&hum_comps.dig2_5,6,3);
                break;
          case 4://work_mode
            hide_all_unit();
            hum_comps.dot2_pos=0;
-           hide_zero(1);
+           hide_zero(&hum_comps.dig2_5,6,1);
            break;
          case 5://count_direction
            hide_all_unit();
            hum_comps.dot2_pos=0;
-           hide_zero(1);
+           hide_zero(&hum_comps.dig2_5,6,1);
            break;  
          case 6://delay_timer
            hide_all_unit();
            hum_comps.dot2_pos=0;
-           hide_zero(4);
+           hide_zero(&hum_comps.dig2_5,6,4);
            break;  
          case 7://timer
            hide_all_unit();
            hum_comps.dot2_pos=0;
-           hide_zero(4);
+           hide_zero(&hum_comps.dig2_5,6,4);
            break;
            
      }
@@ -2380,7 +2588,7 @@ static air_leak_mode_display(unsigned char opt)
                }
 
            }
-           hide_zero(hum_comps.dot2_pos+1);
+           hide_zero(&hum_comps.dig2_5,6,hum_comps.dot2_pos+1);
           hum_comps.dis_oper_mark._bit.refresh_press=0;
        }
         if(!device_comps.sw._bit.over_range)
@@ -2500,7 +2708,7 @@ static void display_temp_to_line2(void)
 {
      
 	long num=device_comps.current_temp;
-	 MD_DID_T10_CELSIUS;
+	 MD_DIS_T10_CELSIUS;
 	switch(num<0)
 	{
 		case 1: num=-num;
@@ -3139,6 +3347,14 @@ hum_comps_t hum_comps=
 	8,//unsigned char dig2_4;
 	8,//unsigned char dig2_5
 	0,//unsigned char dot2_pos;
+
+	8,//unsigned char dig3_0;
+	8,//unsigned char dig3_1;
+	8,//unsigned char dig3_2;
+	8,//unsigned char dig3_3;
+	8,//unsigned char dig3_4;
+	8,//unsigned char dig3_5;
+	8,//char          dot3_pos;
 
     {0},//union dis_oper_mark;
 	0,//int cursor_0;//0 line cursor position
