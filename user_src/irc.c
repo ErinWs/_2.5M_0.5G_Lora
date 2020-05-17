@@ -376,7 +376,7 @@ static unsigned char Pro_irc(unsigned char Cmd,unsigned char *buf)
                 else 
                 {
 				    ircMisc.send_buf[i++]=(buf[9]|0x80);
-				   device_comps.cal_type=0£»
+				   device_comps.cal_type=0;
 				   enter_cal_modify_mode();
 				   
 				    cal_param_dot_bak=buf[13];
@@ -667,7 +667,8 @@ static unsigned char Pro_irc(unsigned char Cmd,unsigned char *buf)
                                 		  }
                                 		  #elif (MD_PRODUCT_NAME==MD_NORMAL)
                                 		  {
-                                                enter_normal_mode();
+                                                 device_comps.max_press=0;
+                                                 enter_normal_mode();
                                 		  }
                                 		  #endif
                                      }
