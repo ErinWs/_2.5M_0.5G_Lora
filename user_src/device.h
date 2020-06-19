@@ -9,7 +9,7 @@
 #define  MD_LORA                 1     //3.6V
 #define  MD_NORMAL               2     //3.6V  switch unit
 #define  MD_NBIOT                3     //3.6V  switch unit
-#define  MD_PRODUCT_NAME         MD_NORMAL  //
+#define  MD_PRODUCT_NAME         MD_LORA  //
 
 #define  MD_DIS5                5
 #define  MD_DIS4                4
@@ -18,7 +18,7 @@
 //#define   MD_MODBUS            //modbus rs485 use irc interface,no sleep
 //#define   MD_NO_LCD
 //#define   MD_TEMP		        //temp display line 2
-//#define   MD_IGNORE_ALL_ERR
+#define   MD_IGNORE_ALL_ERR
 
 
 
@@ -48,6 +48,8 @@
 #define MD_TIME_AIR_LEAK_PARAM_START_ADDR              0x0140
 
 #define MD_SYSTEM_TIME_START_ADDR                      0x0180
+#define MD_DEVICE_SENSOR_START_ADDR                    0x0190
+
 #define MD_LORA_PARAM_START_ADDR                       0x01c0
 
 
@@ -81,6 +83,14 @@
   }
   res_calibration_param_t;
 
+typedef enum  
+{
+	EM_CAL_PRESS=0,
+	EM_CAL_RES,
+	EM_CAL_DELTAP
+	//....TODO.....
+	
+}cal_type_t;
   
   typedef struct
   {
@@ -168,6 +178,12 @@
  }
  device_addr_t;
 
+ typedef struct 
+ {
+     unsigned char ser_num[8];
+     unsigned char cs;
+ }
+ device_sensor_t;
 
 typedef struct
 {
@@ -267,7 +283,7 @@ typedef struct _DEVICE_COMPONENTS
     unsigned char batt;//batt voltage
 	calibration_param_t calibration_param;
 	calibration_param_t calibration_param_bak;
-	int cal_type;//0 cal press, 1,cal temp
+	cal_type_t cal_type;//0 cal press, 1,cal temp
 	int (*read_calibration_param)(void *,int );
     int (*save_calibration_param)(void const *,int);
 
@@ -292,6 +308,11 @@ typedef struct _DEVICE_COMPONENTS
     device_addr_t device_addr;
     int (*read_device_addr)(void *,int);
 	int (*save_device_addr)(void const *,int);
+
+	device_sensor_t device_sensor;
+    int (*read_device_sensor)(void *,int);
+	int (*save_device_sensor)(void const *,int);
+	
 
 	TimeSegData_t TimeSegData;
 	int (*read_time_seg_data_param)(void * , int);

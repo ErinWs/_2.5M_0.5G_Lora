@@ -91,7 +91,7 @@ static unsigned int generateCRC(unsigned char *buffer, unsigned int messageLengt
 
 
 
-static unsigned char Pro_modbus(unsigned char Cmd,unsigned char *buf)
+static unsigned char Pro_modbus(unsigned char Cmd,unsigned char *buf,int len)
 {
 	int i=0;
 	unsigned int crc;
@@ -103,48 +103,64 @@ static unsigned char Pro_modbus(unsigned char Cmd,unsigned char *buf)
 	{
 		unsigned int num=((unsigned int)buf[4]<<8)+buf[5];
 		int k;
-		if((addr>9)||(num+addr>10))
-		{
-		    return 1;
-		}
-		else
+		if(addr==0x40)//ser_num
 		{
             modbusMisc.send_buf[i++]=modbusMisc.param.addr;
             modbusMisc.send_buf[i++]=Cmd;
             modbusMisc.send_buf[i++]=num*2;//length
-            for(k=0;k<num;k++)
-            {
-                if(addr==0||addr==1||addr==3||addr==7)//addr, baud,measure_unit batt
-                {   
-                    modbusMisc.send_buf[i++] =0;
-                    modbusMisc.send_buf[i++] =*((unsigned char *)modbus_data_map[addr++]);
-                }
-                else if(addr==2)//dot
-                {
-                    modbusMisc.send_buf[i++] =0;
-                    modbusMisc.send_buf[i++] =(*((unsigned char *)modbus_data_map[addr++]))-2;
-                }
-                else if(addr==4||addr==5)//press full
-                {
-                    modbusMisc.send_buf[i++] =*((long *)modbus_data_map[addr])/100>>8;
-                    modbusMisc.send_buf[i++] =*((long *)modbus_data_map[addr++])/100;
-                }
-                else if(addr==6||addr==8||addr==9)//6 8 9 temp press_coi temp_coi
-                {
-                    modbusMisc.send_buf[i++] =*((int*)modbus_data_map[addr])>>8;
-                    modbusMisc.send_buf[i++] =*((int*)modbus_data_map[addr++]);
-                }
-                else
-                {
-                    return 1;
-                }   
-            }
+            memcpy(&modbusMisc.send_buf[i],&device_comps.device_sensor.ser_num[0],sizeof(device_comps.device_sensor.ser_num));
+            i+=sizeof(device_comps.device_sensor.ser_num);
             crc=generateCRC(modbusMisc.send_buf, i);
             modbusMisc.send_buf[i++]=crc;
             modbusMisc.send_buf[i++]=crc>>8;
-            modbusComps.write(modbusMisc.send_buf,i);
-		    return 8;
-         }   
+	    modbusComps.write(modbusMisc.send_buf,i);
+            return 8;
+		}
+		else
+		{
+    		if((addr>9)||(num+addr>10))
+    		{
+    		    return 1;
+    		}
+    		else
+    		{
+                modbusMisc.send_buf[i++]=modbusMisc.param.addr;
+                modbusMisc.send_buf[i++]=Cmd;
+                modbusMisc.send_buf[i++]=num*2;//length
+                for(k=0;k<num;k++)
+                {
+                    if(addr==0||addr==1||addr==3||addr==7)//addr, baud,measure_unit batt
+                    {   
+                        modbusMisc.send_buf[i++] =0;
+                        modbusMisc.send_buf[i++] =*((unsigned char *)modbus_data_map[addr++]);
+                    }
+                    else if(addr==2)//dot
+                    {
+                        modbusMisc.send_buf[i++] =0;
+                        modbusMisc.send_buf[i++] =(*((unsigned char *)modbus_data_map[addr++]))-2;
+                    }
+                    else if(addr==4||addr==5)//press full
+                    {
+                        modbusMisc.send_buf[i++] =*((long *)modbus_data_map[addr])/100>>8;
+                        modbusMisc.send_buf[i++] =*((long *)modbus_data_map[addr++])/100;
+                    }
+                    else if(addr==6||addr==8||addr==9)//6 8 9 temp press_coi temp_coi
+                    {
+                        modbusMisc.send_buf[i++] =*((int*)modbus_data_map[addr])>>8;
+                        modbusMisc.send_buf[i++] =*((int*)modbus_data_map[addr++]);
+                    }
+                    else
+                    {
+                        return 1;
+                    }   
+                }
+                crc=generateCRC(modbusMisc.send_buf, i);
+                modbusMisc.send_buf[i++]=crc;
+                modbusMisc.send_buf[i++]=crc>>8;
+                modbusComps.write(modbusMisc.send_buf,i);
+    		    return 8;
+             }
+         }
     }
 	else if(Cmd==6)//Write
 	{
@@ -209,6 +225,23 @@ static unsigned char Pro_modbus(unsigned char Cmd,unsigned char *buf)
 		return 8;
 		
 	}
+	else if(Cmd==0x10)//write ser_num
+	{
+        memcpy(device_comps.device_sensor.ser_num,&buf[7],8);
+    	device_comps.device_sensor.cs=Check_Sum_5A(&device_comps.device_sensor.ser_num, &device_comps.device_sensor.cs-(unsigned char *)&device_comps.device_sensor.ser_num);
+    	device_comps.save_device_sensor(&device_comps.device_sensor.ser_num,sizeof(device_comps.device_sensor));
+        modbusMisc.send_buf[i++]=modbusMisc.param.addr;
+        modbusMisc.send_buf[i++]=Cmd;
+        modbusMisc.send_buf[i++]=buf[2];
+        modbusMisc.send_buf[i++]=buf[3];
+        modbusMisc.send_buf[i++]=buf[4];
+        modbusMisc.send_buf[i++]=buf[5];
+        crc=generateCRC(modbusMisc.send_buf, i);
+		modbusMisc.send_buf[i++]=crc;
+		modbusMisc.send_buf[i++]=crc>>8;
+		modbusComps.write(modbusMisc.send_buf,i);
+		return len;
+	}
 	else 
 	{
 		return 1;
@@ -218,7 +251,7 @@ static unsigned char Pro_modbus(unsigned char Cmd,unsigned char *buf)
 }
 static unsigned char Check_modbus_Com(unsigned char *Rec_Data,unsigned char Rec_Pos)
 {
-
+    int len;
 	if(modbusComps.sw._bit.busy)
 	{
 	    return 0;
@@ -231,7 +264,7 @@ static unsigned char Check_modbus_Com(unsigned char *Rec_Data,unsigned char Rec_
 	{
 		return 1;
 	}
-	if(Rec_Data[1]!=0x03&&Rec_Data[1]!=0x06)
+	if(Rec_Data[1]!=0x03&&Rec_Data[1]!=0x06&&Rec_Data[1]!=0x10)
 	{
 		return 1;
 	}
@@ -239,11 +272,27 @@ static unsigned char Check_modbus_Com(unsigned char *Rec_Data,unsigned char Rec_
 	{
 		return 0;
 	}
-	if(((unsigned int)Rec_Data[7]<<8)+Rec_Data[6]!=generateCRC(Rec_Data,6))
+	if(Rec_Data[1]==0x10)
+	{
+        if(Rec_Data[6]!=8)
+        {
+            return 1;
+        }
+        if(Rec_Pos<8+9) 
+        {
+            return 0;
+        }
+        len=17;
+	}
+	else 
+	{
+	  len=8;
+	}
+	if(((unsigned int)Rec_Data[len-1]<<8)+Rec_Data[len-2]!=generateCRC(Rec_Data,len-2))
 	{
 		return 1;
 	}
-	return Pro_modbus(Rec_Data[1],Rec_Data);
+	return Pro_modbus(Rec_Data[1],Rec_Data,len);
 }
 
 

@@ -446,6 +446,19 @@ static int get_key(hum_comps_t *const this )
 	return key_valve;
 }
 
+static long isNum(int dig)
+{
+    if(dig<10)
+    {
+        return dig;
+    }
+    else 
+    {
+        return 0;
+    }
+}
+
+
 /////////////////////////////////////mode enter and exit//////////////////
 void enter_self_test_mode(void)
 {
@@ -484,15 +497,29 @@ void enter_cal_modify_mode()
     hum_comps.current_mode=EM_CAL_MODIFY_MODE;
     clr_lcd();
     mode_comps[hum_comps.current_mode].dis_option=mode_comps[EM_CAL_QUERY_MODE].dis_option;
-    hum_comps.cursor_2=5;
-    hum_comps.cursor_2_count=0;
-    hum_comps.dis_oper_mark._bit.refresh_option=1;
-    hum_comps.dis_oper_mark._bit.refresh_press_adc=1;
-    hum_comps.dis_oper_mark._bit.refresh_cal_param=1;
-
-    hum_comps.dis_oper_mark._bit.cur0=0;
-    hum_comps.dis_oper_mark._bit.cur1=0;
-    hum_comps.dis_oper_mark._bit.cur2=1;
+    if(device_comps.cal_type==EM_CAL_PRESS)
+    {
+        hum_comps.cursor_2=5;
+        hum_comps.cursor_2_count=2;
+        hum_comps.dis_oper_mark._bit.refresh_option=1;
+        hum_comps.dis_oper_mark._bit.refresh_press_adc=1;
+        hum_comps.dis_oper_mark._bit.refresh_cal_param=1;
+        hum_comps.dis_oper_mark._bit.cur2=1;
+    }
+   
+    else if(device_comps.cal_type==EM_CAL_RES)
+    {
+        hum_comps.cursor_2=5;
+        hum_comps.cursor_2_count=2;
+        hum_comps.dis_oper_mark._bit.refresh_option=1;
+        hum_comps.dis_oper_mark._bit.refresh_temp_adc=1;
+        hum_comps.dis_oper_mark._bit.refresh_res_cal_param=1;
+        hum_comps.dis_oper_mark._bit.cur2=1;
+    }
+    else
+    {
+        NOP();
+    }
   
 }
 
@@ -501,17 +528,29 @@ void enter_cal_query_mode()
     hum_comps.current_mode=EM_CAL_QUERY_MODE;
     clr_lcd();
     mode_comps[hum_comps.current_mode].dis_option=0;
-
-    hum_comps.cursor_2=5;
-    hum_comps.cursor_2_count=2;
-    hum_comps.dis_oper_mark._bit.refresh_option=1;
-    hum_comps.dis_oper_mark._bit.refresh_temp_adc=1;
-    hum_comps.dis_oper_mark._bit.refresh_cal_param=1;
-
-    hum_comps.dis_oper_mark._bit.cur0=0;
-    hum_comps.dis_oper_mark._bit.cur1=0;
-    hum_comps.dis_oper_mark._bit.cur2=0;
-
+    if(device_comps.cal_type==EM_CAL_PRESS)
+    {
+        hum_comps.cursor_2=5;
+        hum_comps.cursor_2_count=2;
+        hum_comps.dis_oper_mark._bit.refresh_option=1;
+        hum_comps.dis_oper_mark._bit.refresh_press_adc=1;
+        hum_comps.dis_oper_mark._bit.refresh_cal_param=1;
+        hum_comps.dis_oper_mark._bit.cur2=0;
+    }
+   
+    else if(device_comps.cal_type==EM_CAL_RES)
+    {
+        hum_comps.cursor_2=5;
+        hum_comps.cursor_2_count=2;
+        hum_comps.dis_oper_mark._bit.refresh_option=1;
+        hum_comps.dis_oper_mark._bit.refresh_temp_adc=1;
+        hum_comps.dis_oper_mark._bit.refresh_res_cal_param=1;
+        hum_comps.dis_oper_mark._bit.cur2=0;
+    }
+    else
+    {
+        NOP();
+    }
 }
 
 void enter_param_query_mode()
@@ -762,21 +801,37 @@ static void pwd_mode_on_s_key()
 }
 static void pwd_mode_on_m_key()
 {
-	unsigned long pwd=(unsigned long)hum_comps.dig2_5*100000+(unsigned long)hum_comps.dig2_4*10000+(unsigned long)hum_comps.dig2_3*1000+(unsigned long)hum_comps.dig2_2*100+hum_comps.dig2_1*10+hum_comps.dig2_0;
-	if(pwd==2111111)
-	{
-	    device_comps.cal_type=1;//0,press,1 temp
-	    enter_cal_query_mode();
-	
-	}
-	else if(pwd==111000)
-	{
-	    enter_param_query_mode();
-	}
-	else
-	{
-		NOP();
-	}
+    long pwd=isNum(hum_comps.dig2_2)*100+isNum(hum_comps.dig2_1)*10+isNum(hum_comps.dig2_0);
+    if(pwd==235)
+    {
+        if(hum_comps.dig2_5>2) //dig0_5 cal_type 0:press 1:pt100  2:deltaP 
+    	{
+            return;
+        }
+        if(hum_comps.dig2_5!=1)
+        {
+           if(hum_comps.dig2_4<3||hum_comps.dig2_4>5||hum_comps.dig2_3>1)//dig0_4 dot 3-5 dig0_3 unit 0Mpa,1Kpa
+           {
+              return;
+           }
+        }
+        device_comps.cal_type=(cal_type_t)hum_comps.dig2_5;//0,press,1 pt100 2,deltaP 
+        if(device_comps.cal_type==EM_CAL_PRESS)
+        {
+            device_comps.calibration_param_bak.dot=hum_comps.dig2_4;
+            device_comps.calibration_param_bak.unit=hum_comps.dig2_3;
+        }
+	 else if(device_comps.cal_type==EM_CAL_RES)
+        {
+            device_comps.res_calibration_param_bak.dot=hum_comps.dig2_4;
+            device_comps.res_calibration_param_bak.unit=hum_comps.dig2_3;
+        }
+        enter_cal_query_mode();
+    }
+    else if(pwd==1237)
+    {
+        enter_param_query_mode();
+    }
 }
 static void pwd_mode_on_j_key()
 {
@@ -817,30 +872,42 @@ static void cal_query_mode_on_s_key(void)
 static void cal_query_mode_on_m_key(void)
 {
 	mode_comps[hum_comps.current_mode].dis_option++;
-	
-	if(device_comps.cal_type==0)
-	{
-
-	}
-	else
-	{
+    if(device_comps.cal_type==EM_CAL_PRESS)
+    {
+        mode_comps[hum_comps.current_mode].dis_option%=4;
+        hum_comps.dis_oper_mark._bit.refresh_option=1;
+        hum_comps.dis_oper_mark._bit.refresh_press_adc=1;
+        hum_comps.dis_oper_mark._bit.refresh_cal_param=1;
+    }
+   
+    else if(device_comps.cal_type==EM_CAL_RES)
+    {
         mode_comps[hum_comps.current_mode].dis_option%=2;
-	}
-	hum_comps.dis_oper_mark._bit.refresh_temp_adc=1;
-	hum_comps.dis_oper_mark._bit.refresh_press_adc=1;
-	hum_comps.dis_oper_mark._bit.refresh_cal_param=1;
-	hum_comps.dis_oper_mark._bit.refresh_option=1;
-	
-	
+        hum_comps.dis_oper_mark._bit.refresh_option=1;
+        hum_comps.dis_oper_mark._bit.refresh_temp_adc=1;
+        hum_comps.dis_oper_mark._bit.refresh_res_cal_param=1;
+    }
 }
 static void cal_query_mode_on_j_key(void)
 {
-    *(&hum_comps.dig2_0+hum_comps.cursor_2)=(*(&hum_comps.dig2_0+hum_comps.cursor_2)+1)%10;
+   
 }
 
 static void cal_query_mode_on_long_m_key(void)
 {
-	enter_normal_mode();
+  #if(MD_PRODUCT_NAME==MD_LORA)
+  {
+	  enter_lora_mode();
+  }
+  #elif (MD_PRODUCT_NAME==MD_AIR_LEAK)
+  {
+	  enter_air_leak_mode();
+  }
+  #elif (MD_PRODUCT_NAME==MD_NORMAL)
+  {
+        enter_normal_mode();
+  }
+  #endif
 	
 }
 
@@ -852,43 +919,50 @@ static void cal_modify_mode_on_s_key(void)
 }
 static void cal_modify_mode_on_m_key(void)
 {
-	 int save_data_en=0;
-	 long num=(unsigned long)hum_comps.dig2_5*100000+(unsigned long)hum_comps.dig2_4*10000+(unsigned long)hum_comps.dig2_3*1000+
-								(unsigned long)hum_comps.dig2_2*100+
-									       (unsigned long)hum_comps.dig2_1*10+           
-								               hum_comps.dig2_0;        
-								           
-								                         
-	if(device_comps.cal_type==0)
+     int save_data_en=0;
+	 int opt=mode_comps[hum_comps.current_mode].dis_option;
+	       
+    if(device_comps.cal_type==EM_CAL_PRESS)
 	{
 		if(device_comps.sw._bit.adc_stb)
 		{
+            long num=isNum(hum_comps.dig2_5)*100000+isNum(hum_comps.dig2_4)*10000+isNum(hum_comps.dig2_3)*1000+
+					 isNum(hum_comps.dig2_2)*100+isNum(hum_comps.dig2_1)*10+isNum(hum_comps.dig2_0);
 			save_data_en=1;
 			device_comps.calibration_param.x[mode_comps[hum_comps.current_mode].dis_option]=device_comps.ad1_ad2_average_result;
 			device_comps.calibration_param.y[mode_comps[hum_comps.current_mode].dis_option]=num;
 			device_comps.calibration_param.t[mode_comps[hum_comps.current_mode].dis_option];
-			device_comps.calibration_param.cs=Check_Sum_5A(&device_comps.calibration_param, & device_comps.calibration_param.cs-£¨unsigned char *)&device_comps.calibration_param);
+			device_comps.calibration_param.dot=device_comps.calibration_param_bak.dot;
+			device_comps.calibration_param.unit=device_comps.calibration_param_bak.unit;
+			device_comps.calibration_param.cs=Check_Sum_5A(&device_comps.calibration_param, & device_comps.calibration_param.cs-(unsigned char *)&device_comps.calibration_param);
 			device_comps.save_calibration_param(&device_comps.calibration_param,sizeof(device_comps.calibration_param));
+			hum_comps.dis_oper_mark._bit.refresh_cal_param=1;
+		    hum_comps.dis_oper_mark._bit.cur2=0;
 		}
 	}
-    else if(device_comps.cal_type==1)
+	else if(device_comps.cal_type==EM_CAL_RES)
 	{
 		if(device_comps.sw._bit.temp_adc_stb)
 		{
+            long num=isNum(hum_comps.dig2_5)*100000+isNum(hum_comps.dig2_4)*10000+isNum(hum_comps.dig2_3)*1000+
+					 isNum(hum_comps.dig2_2)*100+isNum(hum_comps.dig2_1)*10+isNum(hum_comps.dig2_0);
 			save_data_en=1;
 			device_comps.res_calibration_param.x[mode_comps[hum_comps.current_mode].dis_option]=device_comps.temp_p_temp_n_average_result;
 			device_comps.res_calibration_param.y[mode_comps[hum_comps.current_mode].dis_option]=num;
-			//device_comps.res_calibration_param.t[mode_comps[hum_comps.current_mode].dis_option];
-			device_comps.res_calibration_param.cs=Check_Sum_5A(&device_comps.res_calibration_param, & device_comps.res_calibration_param.cs-£¨unsigned char *)&device_comps.res_calibration_param);
+			device_comps.res_calibration_param.t[mode_comps[hum_comps.current_mode].dis_option];
+			device_comps.res_calibration_param.dot=device_comps.res_calibration_param_bak.dot;
+			device_comps.res_calibration_param.unit=device_comps.res_calibration_param_bak.unit;
+			device_comps.res_calibration_param.cs=Check_Sum_5A(&device_comps.res_calibration_param, & device_comps.res_calibration_param.cs-(unsigned char *)&device_comps.res_calibration_param);
 			device_comps.save_res_calibration_param(&device_comps.res_calibration_param,sizeof(device_comps.res_calibration_param));
+			hum_comps.dis_oper_mark._bit.refresh_res_cal_param=1;
+		    hum_comps.dis_oper_mark._bit.cur2=0;
 		}
 	}
 	if(save_data_en==1)
 	{
 		hum_comps.current_mode=EM_CAL_QUERY_MODE;
 		mode_comps[hum_comps.current_mode].dis_option=mode_comps[EM_CAL_MODIFY_MODE].dis_option;
-		hum_comps.dis_oper_mark._bit.refresh_cal_param=1;
-		hum_comps.dis_oper_mark._bit.cur2=0;
+	
 	}
 }
 static void cal_modify_mode_on_j_key(void)
@@ -898,8 +972,19 @@ static void cal_modify_mode_on_j_key(void)
 }
 static void cal_modify_mode_on_long_s_key(void)
 {
-	
-	
+  #if(MD_PRODUCT_NAME==MD_LORA)
+  {
+	  enter_lora_mode();
+  }
+  #elif (MD_PRODUCT_NAME==MD_AIR_LEAK)
+  {
+	  enter_air_leak_mode();
+  }
+  #elif (MD_PRODUCT_NAME==MD_NORMAL)
+  {
+        enter_normal_mode();
+  }
+  #endif
 }
 static void param_query_mode_on_s_key(void)
 {
@@ -930,17 +1015,7 @@ static void param_query_mode_on_long_m_key(void)
     #endif
 }
 
-static long isNum(int dig)
-{
-    if(dig<10)
-    {
-        return dig;
-    }
-    else 
-    {
-        return 0;
-    }
-}
+
 static void param_modify_mode_on_m_key(void)
 {
 	 int save_data_en=0;
@@ -1063,6 +1138,11 @@ static void lora_mode_on_m_key(void)
     mode_comps[hum_comps.current_mode].displayTimer=-1;
 }
 
+static void lora_mode_on_long_m_key(void)
+{
+    enter_pawd_mode();
+}
+
 
 ///////////////////////END KEY FUNCTION////////////////////
 
@@ -1100,39 +1180,37 @@ void  display_opt(int opt)
 void display_temp_adc(void)
 {
  
-    
-     long num=device_comps.temp_p_temp_n_average_result; 
-     int i=0;
-        switch(num<0)
-        {
-            case 1: num=-num;
-                hum_comps.dig1_0=num%10;
-                hum_comps.dig1_1=num/10%10;
-                hum_comps.dig1_2=num/100%10;
-                hum_comps.dig1_3=num/1000%10;
-                hum_comps.dot1_pos=0;//
-                hum_comps.dig0_0=num/10000%10;
-                hum_comps.dig0_1=MD_HIDE_DISP-1;
-                hum_comps.dot0_pos=0;// 
-                break;
-            
-            case 0:
-                hum_comps.dig1_0=num%10;
-                hum_comps.dig1_1=num/10%10;
-                hum_comps.dig1_2=num/100%10;
-                hum_comps.dig1_3=num/1000%10;
-                hum_comps.dot1_pos=0;//
-                hum_comps.dig0_0=num/10000%10;
-                hum_comps.dig0_1=MD_HIDE_DISP;
-                hum_comps.dot0_pos=0;// 
-               
-               
-              
-                break;
-            default:
-                break;
-       }
-       
+    if(hum_comps.dis_oper_mark._bit.refresh_temp_adc)
+    {
+         long num=device_comps.temp_p_temp_n_average_result; 
+         int i=0;
+            switch(num<0)
+            {
+                case 1: num=-num;
+                    hum_comps.dig1_0=num%10;
+                    hum_comps.dig1_1=num/10%10;
+                    hum_comps.dig1_2=num/100%10;
+                    hum_comps.dig1_3=MD_HIDE_DISP-1;
+                    hum_comps.dot1_pos=0;//
+                    hum_comps.dig0_0=MD_HIDE_DISP;
+                    ;
+                    hum_comps.dot0_pos=0;// 
+                    break;
+                
+                case 0:
+                    hum_comps.dig1_0=num%10;
+                    hum_comps.dig1_1=num/10%10;
+                    hum_comps.dig1_2=num/100%10;
+                    hum_comps.dig1_3=num/1000%10;
+                    hum_comps.dot1_pos=0;//
+                    hum_comps.dig0_0=MD_HIDE_DISP;
+                    hum_comps.dot0_pos=0;//
+                    break;
+                default:
+                    break;
+           }
+           hum_comps.dis_oper_mark._bit.refresh_temp_adc=0;
+    }
   
    
     if(device_comps.sw._bit.temp_adc_stb)
@@ -1165,7 +1243,8 @@ void display_temp_adc(void)
 
 void display_press_adc(void)
 {
-  
+   if(hum_comps.dis_oper_mark._bit.refresh_press_adc)
+   {
         long num=device_comps.ad1_ad2_average_result; 
         int i=0;
         switch(num<0)
@@ -1174,9 +1253,9 @@ void display_press_adc(void)
                 hum_comps.dig1_0=num%10;
                 hum_comps.dig1_1=num/10%10;
                 hum_comps.dig1_2=num/100%10;
-                hum_comps.dig1_3=num/1000%10;
+                hum_comps.dig1_3=MD_HIDE_DISP-1;
                 hum_comps.dot1_pos=0;//
-                hum_comps.dig0_0=MD_HIDE_DISP-1;
+                hum_comps.dig0_0=MD_HIDE_DISP;
                 hum_comps.dot0_pos=0;// 
                 break;
             
@@ -1186,7 +1265,7 @@ void display_press_adc(void)
                 hum_comps.dig1_2=num/100%10;
                 hum_comps.dig1_3=num/1000%10;
                 hum_comps.dot1_pos=0;//
-                hum_comps.dig0_0=num/10000%10;
+                hum_comps.dig0_0=MD_HIDE_DISP;
                 hum_comps.dot0_pos=0;// 
                
                
@@ -1195,8 +1274,8 @@ void display_press_adc(void)
             default:
                 break;
        }
-       
-  
+      hum_comps.dis_oper_mark._bit.refresh_press_adc=0;
+  }
    
     if(device_comps.sw._bit.adc_stb)
     {
@@ -1931,7 +2010,7 @@ static void normal_mode_display(unsigned char opt)
 static void debug_mode_display(unsigned char opt)
 {
 
-//	if(hum_comps.dis_oper_mark._bit.refresh_press_adc)
+	if(hum_comps.dis_oper_mark._bit.refresh_press_adc)
 	{
         long num=device_comps.ad1_ad2_average_result; 
 		int i=0;
@@ -1960,7 +2039,8 @@ static void debug_mode_display(unsigned char opt)
             default:
                 break;
         }
-		
+		 hum_comps.dis_oper_mark._bit.refresh_press_adc=0;
+	}
 
 
     if(device_comps.sw._bit.adc_stb)
@@ -1987,14 +2067,68 @@ static void debug_mode_display(unsigned char opt)
         }
     }
      display_line2_data(); 
-	 hum_comps.dis_oper_mark._bit.refresh_press_adc=0;
-	}
 	
-//	if(hum_comps.dis_oper_mark._bit.refresh_temp_adc)
+	
+	if(hum_comps.dis_oper_mark._bit.refresh_temp_adc)
 	{
-	    display_temp_adc();
-        hum_comps.dis_oper_mark._bit.refresh_temp_adc=0;
+	    long num=device_comps.temp_p_temp_n_average_result; 
+        int i=0;
+        switch(num<0)
+        {
+            case 1: num=-num;
+                hum_comps.dig1_0=num%10;
+                hum_comps.dig1_1=num/10%10;
+                hum_comps.dig1_2=num/100%10;
+                hum_comps.dig1_3=num/1000%10;
+                hum_comps.dot1_pos=0;//
+                hum_comps.dig0_0=num/10000%10;
+                hum_comps.dig0_1=MD_HIDE_DISP-1;
+                hum_comps.dot0_pos=0;// 
+                break;
+            
+            case 0:
+                hum_comps.dig1_0=num%10;
+                hum_comps.dig1_1=num/10%10;
+                hum_comps.dig1_2=num/100%10;
+                hum_comps.dig1_3=num/1000%10;
+                hum_comps.dot1_pos=0;//
+                hum_comps.dig0_0=num/10000%10;
+                hum_comps.dig0_1=MD_HIDE_DISP;
+                hum_comps.dot0_pos=0;// 
+                break;
+            default:
+                break;
+       }
+       hum_comps.dis_oper_mark._bit.refresh_temp_adc=0;
 	}
+  
+   
+    if(device_comps.sw._bit.temp_adc_stb)
+    {
+        hum_comps.dis_oper_mark._bit.cur1=0;
+        hum_comps.dis_oper_mark._bit.dis1=1;
+    }
+    else
+    {
+        hum_comps.dis_oper_mark._bit.cur1=1;
+        hum_comps.cursor_1=-1;
+        hum_comps.cursor_1_count++;
+        if(hum_comps.cursor_1_count>4)
+        {
+            hum_comps.cursor_1_count=0;
+            if(hum_comps.dis_oper_mark._bit.dis1)
+            {
+                hum_comps.dis_oper_mark._bit.dis1=0;
+            }
+            else
+            {
+               hum_comps.dis_oper_mark._bit.dis1=1;
+            }
+        }
+    }
+      display_line1_data();
+      display_line0_data();
+    
 	
 }
 static void pwd_mode_display(unsigned char opt)
@@ -2020,7 +2154,7 @@ static void pwd_mode_display(unsigned char opt)
 }
 static void param_query_mode_display(unsigned char opt)
 {
-  //  if(hum_comps.dis_oper_mark._bit.refresh_option)
+    if(hum_comps.dis_oper_mark._bit.refresh_option)
     {
         display_opt(opt);
         hum_comps.dis_oper_mark._bit.refresh_option=0;
@@ -2346,15 +2480,11 @@ static void cal_query_mode_display(unsigned char opt)
         display_opt(opt);
         hum_comps.dis_oper_mark._bit.refresh_option=0;
     }
-    
-    if(device_comps.cal_type==0)
+    if(device_comps.cal_type==EM_CAL_PRESS)
     {
-     //   if(hum_comps.dis_oper_mark._bit.refresh_press_adc)
-        {
-            display_press_adc();
-            hum_comps.dis_oper_mark._bit.refresh_press_adc=0;
-        }
-        //if(hum_comps.dis_oper_mark._bit.refresh_cal_param)
+        display_press_adc();
+        
+        if(hum_comps.dis_oper_mark._bit.refresh_cal_param)
         {
             hum_comps.dig2_0=device_comps.calibration_param.y[opt]%10;
             hum_comps.dig2_1=device_comps.calibration_param.y[opt]/10%10;
@@ -2362,26 +2492,27 @@ static void cal_query_mode_display(unsigned char opt)
             hum_comps.dig2_3=device_comps.calibration_param.y[opt]/1000%10;
             hum_comps.dig2_4=device_comps.calibration_param.y[opt]/10000%10;
             hum_comps.dig2_5=device_comps.calibration_param.y[opt]/100000%10;
-            hum_comps.dot2_pos=0;
+            hum_comps.dot2_pos=device_comps.calibration_param.dot;
             display_line2_data();
             hum_comps.dis_oper_mark._bit.refresh_cal_param=0;
-            
-       }
+        }
         
     }
-    else if(device_comps.cal_type==1)
+    else if(device_comps.cal_type==EM_CAL_RES)
     {
-
         display_temp_adc();
-        hum_comps.dig2_0=device_comps.res_calibration_param.y[opt]%10;
-        hum_comps.dig2_1=device_comps.res_calibration_param.y[opt]/10%10;
-        hum_comps.dig2_2=device_comps.res_calibration_param.y[opt]/100%10;
-        hum_comps.dig2_3=device_comps.res_calibration_param.y[opt]/1000%10;
-        hum_comps.dig2_4=device_comps.res_calibration_param.y[opt]/10000%10;
-        hum_comps.dig2_5=device_comps.res_calibration_param.y[opt]/100000%10;
-        hum_comps.dot2_pos=2;
-        display_line2_data();
-        hum_comps.dis_oper_mark._bit.refresh_cal_param=0;
+        if(hum_comps.dis_oper_mark._bit.refresh_res_cal_param)
+        {
+            hum_comps.dig2_0=device_comps.res_calibration_param.y[opt]%10;
+            hum_comps.dig2_1=device_comps.res_calibration_param.y[opt]/10%10;
+            hum_comps.dig2_2=device_comps.res_calibration_param.y[opt]/100%10;
+            hum_comps.dig2_3=device_comps.res_calibration_param.y[opt]/1000%10;
+            hum_comps.dig2_4=device_comps.res_calibration_param.y[opt]/10000%10;
+            hum_comps.dig2_5=device_comps.res_calibration_param.y[opt]/100000%10;
+            hum_comps.dot2_pos=2;
+            display_line2_data();
+            hum_comps.dis_oper_mark._bit.refresh_res_cal_param=0;
+        }
     }
     
  
@@ -2395,13 +2526,10 @@ static void cal_modify_mode_display(unsigned char opt)
         hum_comps.dis_oper_mark._bit.refresh_option=0;
     }
 
-    if(device_comps.cal_type==0)
+    if(device_comps.cal_type==EM_CAL_PRESS)
     {
-      //  if(hum_comps.dis_oper_mark._bit.refresh_press_adc)
-        {
-            display_press_adc();
-            hum_comps.dis_oper_mark._bit.refresh_press_adc=0;
-        }
+        display_press_adc();
+       
         if(hum_comps.dis_oper_mark._bit.refresh_cal_param)
         {
             hum_comps.dig2_0=device_comps.calibration_param.y[opt]%10;
@@ -2410,15 +2538,26 @@ static void cal_modify_mode_display(unsigned char opt)
             hum_comps.dig2_3=device_comps.calibration_param.y[opt]/1000%10;
             hum_comps.dig2_4=device_comps.calibration_param.y[opt]/10000%10;
             hum_comps.dig2_5=device_comps.calibration_param.y[opt]/100000%10;
-            hum_comps.dot2_pos=0;
-           // display_line2_data();
+            hum_comps.dot2_pos=device_comps.calibration_param_bak.dot;
             hum_comps.dis_oper_mark._bit.refresh_cal_param=0;
             
        }
     }
-    else if(device_comps.cal_type==1)
+    else if(device_comps.cal_type==EM_CAL_RES)
     {
-            display_temp_adc();
+        display_temp_adc();
+        if(hum_comps.dis_oper_mark._bit.refresh_res_cal_param)
+        {
+			hum_comps.dig2_0=device_comps.res_calibration_param.y[opt]%10;
+            hum_comps.dig2_1=device_comps.res_calibration_param.y[opt]/10%10;
+            hum_comps.dig2_2=device_comps.res_calibration_param.y[opt]/100%10;
+            hum_comps.dig2_3=device_comps.res_calibration_param.y[opt]/1000%10;
+            hum_comps.dig2_4=device_comps.res_calibration_param.y[opt]/10000%10;
+            hum_comps.dig2_5=device_comps.res_calibration_param.y[opt]/100000%10;
+            hum_comps.dot2_pos=2;
+           // display_line2_data();
+            hum_comps.dis_oper_mark._bit.refresh_res_cal_param=0;
+        }
             
     }
     
@@ -3301,7 +3440,7 @@ mode_comps_t  mode_comps[]=//Handling of keys in different modes
     {"self_test_mode"    ,mode_comps+7  ,EM_SELF_TEST_MODE     ,nop                       ,nop                       ,nop          	            ,nop			                 ,nop               	         ,nop                            ,nop                            ,self_test_mode_display   ,0,0},
     {"report_mode"       ,mode_comps+8  ,EM_REPORT_MODE        ,nop                       ,nop                       ,nop          	            ,nop			                 ,nop               	         ,nop                            ,nop                            ,report_mode_display      ,0,0},
     {"air_leak_mode"     ,mode_comps+9  ,EM_AIR_LEAK_MODE      ,nop                       ,nop                       ,air_leak_mode_on_j_key    ,nop			                 ,air_leak_mode_on_long_m_key    ,normal_mode_on_long_j_key      ,normal_mode_on_long_s_and_j_key,air_leak_mode_display    ,0,0},
-    {"lora mode"         ,mode_comps+10 ,EM_LORA_MODE          ,nop                       ,lora_mode_on_m_key        ,nop                       ,nop			                 ,nop                            ,normal_mode_on_long_j_key      ,normal_mode_on_long_s_and_j_key,lora_mode_display        ,0,0},
+    {"lora mode"         ,mode_comps+10 ,EM_LORA_MODE          ,nop                       ,lora_mode_on_m_key        ,nop                       ,nop			                 ,lora_mode_on_long_m_key        ,normal_mode_on_long_j_key      ,normal_mode_on_long_s_and_j_key,lora_mode_display        ,0,0},
 };
 
  static void hum_comps_task_handle()////Execution interval is 50 ms

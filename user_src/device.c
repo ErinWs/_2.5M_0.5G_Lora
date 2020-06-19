@@ -47,7 +47,78 @@ static const long temp_tab[] =
 
 };
 
+static const int pt100_tab[]=
+{   
+    
+    7633 ,7673 ,7713 ,7752 ,7792 ,7832 ,7872 ,7911 ,7951 ,7991, //-60....-51
+    8031 ,8070 ,8110 ,8150 ,8189 ,8229 ,8269 ,8308 ,8348 ,8388, 
+    8427 ,8467 ,8506 ,8546 ,8585 ,8625 ,8664 ,8704 ,8743 ,8783, 
+    8822 ,8862 ,8901 ,8940 ,8980 ,9019 ,9059 ,9093 ,9137 ,9177, 
+    9216 ,9255 ,9295 ,9334 ,9373 ,9412 ,9452 ,9491 ,9530 ,9569, 
+    9609 ,9648 ,9687 ,9726 ,9765 ,9804 ,9844 ,9883 ,9922 ,9961,//-10....-1
+    
+    10000,10039,10078,10117,10156,10195,10234,10273,10312,10351,//0......9
+    10390,10429,10468,10507,10546,10585,10624,10663,10702,10740,
+    10779,10818,10875,10896,10935,10973,11012,11051,11090,11128,
+    11167,11206,11245,11283,11322,11361,11499,11438,11477,11515,
+    11554,11593,11631,11670,11708,11747,11785,11824,11862,11901,
+    11940,11978,12016,12055,12093,12132,12170,12209,12247,12286,
+    12324,12362,12401,12439,12477,12516,12554,12592,12631,12669,
+    12707,12745,12784,12822,12860,12898,12937,12975,13013,13051,
+    13089,13127,13166,13204,13242,13280,13318,13356,13394,13432,
+    13470,13508,13546,13584,13622,13660,13698,13736,13774,13812,
+    13850,13888,13926,13964,14002,14039,14077,14115,14153,14191,
+    14229,14266,14304,14342,14380,14417,14455,14493,14531,14568,
+    14606,14644,14681,14719,14757,14794,14832,14870,14907,14945,
+    14982,15020,15057,15095,15133,15170,15208,15245,15283,15320,
+    15358,15395,15432,15470,15507,15545,15582,15619,15657,15694,
+    15731,15769,15806,15843,15881,15918,15955,15993,16030,16067,
+    16104,16142,16179,16216,16253,16290,16327,16365,16402,16439,
+    16476,16513,16550,16587,16624,16661,16698,16735,16772,16809,
+    16846,16883,16920,16957,16994,17031,17068,17105,17142,17179,
+    17216,17253,17290,17326,17363,17400,17437,17474,17510,17547,
+    17584,17621,17657,17694,17731,17768,17804,17841,17878,17914,
+    17951,17988,18024,18061,18097,18134,18171,18207,18244,18280,
+    18317,18353,18390,18426,18463,18499,18536,18572,18609,18645,
+    18632,18718,18754,18791,18827,18863,18900,18936,18972,19009,
+    19045,19081,19118,19154,19190,19226,19263,19299,19335,19371,
+    19407,19444,19480,19516,19552,19588,19624,19660,19696,19733,
+    19769,19805,19841,19877,19913,19949,19985,20021,20057,20093,
+    20129,20165,20201,20236,20272,20308,20344,20380,20416,20452,
+    20488,20523,20559,20595,20631,20667,20702,20738,20774,20810,
+    20845,20881,20917,20952,20988,21024,21059,21095,21131,21166,
+    21202,21237,21273,21309,21344,21380,21415,21451,21486,21522,
+    21557,21593,21628,21664,21799,21735,21770,21805,21841,21876,
+    21912,21947,21982,22018,22053,22088,22124,22159,22194,22229,
+    22265,22300,22335,22370,22406,22441,22476,22511,22546,22581,
+    22617,22652,22687,22722,22757,22792,22827,22862,22897,22932,
+    22962,23002,23042,23082,23122,23162,23202,23242,23282,23322,
+    23317,23352,23387,23422,23456,23491,23526,23561,23596,23631,
+    23665,23700,23735,23770,23804,23839,23874,23909,23945,23978,
+    24013,24047,24082,24117,24151,24186,24220,24255,24290,24324,
+    24359,24393,24428,24462,24497,24531,24566,24600,24635,24669,
+    24704,24738,24773,24807,24841,24876,24910,24945,24979,25013,
+    25048,25082,25116,25150,25185,25219,25253,25255,25322,25356,
+    25390,25424,25459,25493,25527,25561,25595,25629,25664,25698,
+    25732,25766,25800,25834,25868,25902,25936,25970,26004,26038,
+    26072,26106,26140,26174,26208,26242,26276,26310,26343,26377,
+    26411,26445,26479,26513,26547,26580,26614,26648,26682,26715,
+    26749,26783,26817,26850,26884,26918,26951,26985,27019,27052,
+    27086,27120,27153,27187,27220,27254,27288,27321,27355,27388,
+    27422,27455,27489,27522,27556,27589,27623,27656,27689,27723,
+    27756,27790,27823,27856,27890,27923,27956,27990,28023,28056,
+    28090,28123,28156,28189,28223,28256,28289,28322,28355,28389,
+    28422,28455,28488,28521,28554,28587,28621,28654,28687,28720,
+    28753,28786,28819,28852,28885,28918,28951,28984,29017,29050,
+    29083,29116,29149,29181,29214,29247,29280,29313,29346,29379,
+    29411,29444,29477,29510,29543,29575,29608,29641,29674,29706,
+    29739,29772,29804,29837,29870,29902,29935,29968,30000,30033,
+    30065,30098,30131,30163,30196,30228,30261,30293,30326,30358,
+    30391,30423,30456,30488,30520,30553,30585,30618,30650,30682,
+    30715,30747,30779,30812,30844,30876,30909,30941,30973,31005,
+    31038,31070,31102,31134,31167,31199,31231,31263,31295,31327,//590...599
 
+};
 
 static void delay_us(int t)
 {
@@ -160,6 +231,15 @@ int read_device_addr(void *buf,int len)
     return _24cxx_comps.write(MD_DEVICE_ADDR_START_ADDR,buf,len);
  }
 
+
+int read_device_sensor(void *buf,int len)
+{
+return _24cxx_comps.read(MD_DEVICE_SENSOR_START_ADDR,buf,len);
+}
+int save_device_sensor(void const *buf,int len)
+{
+return _24cxx_comps.write(MD_DEVICE_SENSOR_START_ADDR,buf,len);
+}
 
  static void get_batt()
  {
@@ -323,14 +403,59 @@ static long calc_pt_valve(device_comps_t *const this)
     
 	long delta_y=this->res_calibration_param.y[1]-this->res_calibration_param.y[0];
 	long delta_x=this->res_calibration_param.x[1]-this->res_calibration_param.x[0];
-    	long pt_valve=delta_y*(this->temp_p_temp_n_average_result-this->res_calibration_param.x[0])/delta_x+this->res_calibration_param.y[0];
+    long pt_valve=delta_y*(this->temp_p_temp_n_average_result-this->res_calibration_param.x[0])/delta_x+this->res_calibration_param.y[0];
 	return pt_valve;
 
 }
 
 static int calc_pt_temp(device_comps_t  *const this)
 {
+    long Tem;
+    long LowRValue;
+    long HighRValue;        
+    long   Tem0;
+    int i;
+    int  cBottom, cTop;
+    int  limit=sizeof(pt100_tab)/sizeof(pt100_tab[0])-1;
+    
 
+    if (this->pt_valve <pt100_tab[0])                // 电阻值小于表格最值低于量程下限。
+    {
+         return -600;
+    }
+    if (this->pt_valve >pt100_tab[limit])        // 电阻值大于表格最大值，超出量程上限 。
+    {
+        return 5990;
+    }
+    cBottom = 0; 
+    cTop    = limit;
+     for (i=limit/2; (cTop-cBottom)!=1; )        // 2分法查表。
+    {
+
+       if (this->pt_valve <pt100_tab[i])
+        {
+            cTop = i;
+            i = (cTop + cBottom) / 2;
+        }
+        else if (this->pt_valve > pt100_tab[i])
+        {
+            cBottom = i;
+            i = (cTop + cBottom) / 2;
+        }
+        else
+        {
+            Tem0 = i * 10 - 600;
+            Tem = Tem0;
+            goto ret;
+        }
+    }
+    Tem0 = i * 10 - 600;
+    LowRValue  =pt100_tab[cBottom];
+    HighRValue = pt100_tab[cTop];
+    Tem = ( ((this->pt_valve - LowRValue)*10) / (HighRValue - LowRValue) ) + Tem0;        // 表格是以5度为一步的。
+ret:
+    Tem=Tem*this->coe.temp/10000;
+    return Tem;
 
 
 }
@@ -710,6 +835,13 @@ static void read_all_param(struct _DEVICE_COMPONENTS  *const this)
                 memcpy(&device_comps.device_addr.addr[0],default_addr,sizeof(device_comps.device_addr.addr));
             }
         }
+        if(!read_device_sensor(&device_comps.device_sensor,sizeof(device_comps.device_sensor)))
+        {
+            if(device_comps.device_sensor.cs!=Check_Sum_5A(&device_comps.device_sensor, & device_comps.device_sensor.cs-(unsigned char *)&device_comps.device_sensor))
+            {
+                memset(&device_comps.device_sensor.ser_num[0],0,sizeof(device_comps.device_sensor.ser_num));
+            }
+        }
         if(!read_access_param(&device_comps.access_param,sizeof(device_comps.access_param)))
         {
             if(device_comps.access_param.cs!=Check_Sum_5A(&device_comps.access_param, &device_comps.access_param.cs-(unsigned char *)&device_comps.access_param))
@@ -901,23 +1033,26 @@ static void device_comps_task_handle(void)//Execution interval is 200 ms
             long ad1_ad3_temp=0;
 			this->count=0;
 			get_batt();
-			
-			ad1_ad3_temp=this->ad3_average_result;
-            this->ad3_average_result=this->calc_ad3_average(this);
-            this->ntc_valve=this->calc_ntc_valve(this);
+
+
+			//NTC TEMP
+			//ad1_ad3_temp=this->ad3_average_result;
+            //this->ad3_average_result=this->calc_ad3_average(this);
+            //this->ntc_valve=this->calc_ntc_valve(this);
+           // this->current_temp_n_2=this->current_temp_n_1;
+           // this->current_temp_n_1=this->current_temp;
+           // this->current_temp=this->calc_temp(this);
+            //ad1_ad3_temp-=this->ad3_average_result;
+
+
+            //PT100 TEMP
+            ad1_ad3_temp=this->temp_p_temp_n_average_result;
+            this->temp_p_temp_n_average_result=this->calc_temp_p_temp_n_average(this);
+            this->pt_valve=this->calc_pt_valve(this);
             this->current_temp_n_2=this->current_temp_n_1;
             this->current_temp_n_1=this->current_temp;
-            this->current_temp=this->calc_temp(this);
-            ad1_ad3_temp-=this->ad3_average_result;
-
-           // ad1_ad3_temp=this->temp_p_temp_n_average_result;
-			//this->ad3_average_result=this->temp_p_temp_n_average_result=this->calc_temp_p_temp_n_average(this);
-			// //this->temp_p_temp_n_average_result=this->temp_p_convert_result[0];
-			//this->pt_valve=this->calc_pt_valve(this);
-			//this->current_temp_n_2=this->current_temp_n_1;
-            //this->current_temp_n_1=this->current_temp;
-			//this->current_temp=this->calc_pt_temp(this);
-            //ad1_ad3_temp-=this->temp_p_temp_n_average_result;
+            this->current_temp=this->calc_pt_temp(this);
+            ad1_ad3_temp-=this->temp_p_temp_n_average_result;
 			
 			if(ad1_ad3_temp<0)
 			{
@@ -985,21 +1120,25 @@ static void device_comps_task_handle(void)//Execution interval is 200 ms
 		 
 		}
        
-        MD_SET_REF_3030C_ON;
+       
+        if(this->count==0||this->count==2||this->count==4)
+        {
+            MD_SET_REF_3030C_ON;
+            delay_us(100);//400
+            
+            cs123x_comps.restart();
+            NOP();NOP();NOP();NOP();NOP();NOP();NOP();NOP();
+            while(MD_CS123X_DATA);
+            cs123x_comps.write_reg(&this->ad1_convert_result[this->ad1_pos++],0x7d);
+            //cs123x_comps.read_adc(&this->ad1_convert_result[this->ad1_pos++]);
+            NOP();NOP();NOP();NOP();NOP();NOP();NOP();NOP();
+            while(MD_CS123X_DATA);
+            cs123x_comps.write_reg(&this->temp_p_convert_result[this->temp_p_pos++],0x7c);
+            cs123x_comps.power_down();
+
         
 
-
-      
-       delay_us(100);//400
-       cs123x_comps.restart();
-       NOP();NOP();NOP();NOP();NOP();NOP();NOP();NOP();
-       while(MD_CS123X_DATA);
-       //cs123x_comps.write_reg(&this->ad1_convert_result[this->ad1_pos++],0x7d);
-         cs123x_comps.read_adc(&this->ad1_convert_result[this->ad1_pos++]);
-//       NOP();NOP();NOP();NOP();NOP();NOP();NOP();NOP();
-//       while(MD_CS123X_DATA);
-//       cs123x_comps.write_reg(&this->temp_p_convert_result[this->temp_p_pos++],0x7c);
-         cs123x_comps.power_down();
+        
        
 	       
 //        	R_ADC_Set_OperationOff();
@@ -1008,14 +1147,14 @@ static void device_comps_task_handle(void)//Execution interval is 200 ms
 //	        ADM2|=0x40;
 //	        delay_us(40);
 		
-                ADS = _01_AD_INPUT_CHANNEL_1;
-	        R_ADC_Set_OperationOn();
-	        delay_us(2);
-		
-		device_comps.sw._bit.adc_busy=1;
-		R_ADC_Start();
-		while(device_comps.sw._bit.adc_busy);
-		R_ADC_Get_Result(&this->ad3_convert_result[this->ad3_pos++]);
+//            ADS = _01_AD_INPUT_CHANNEL_1;
+//	        R_ADC_Set_OperationOn();
+//	        delay_us(2);
+//		
+//		device_comps.sw._bit.adc_busy=1;
+//		R_ADC_Start();
+//		while(device_comps.sw._bit.adc_busy);
+//		R_ADC_Get_Result(&this->ad3_convert_result[this->ad3_pos++]);
 
 		
 	/*
@@ -1053,9 +1192,9 @@ static void device_comps_task_handle(void)//Execution interval is 200 ms
 		R_ADC_Get_Result(&this->temp_n_convert_result[this->temp_n_pos++]);
         
       */ 
-	R_ADC_Set_OperationOff();
+	//R_ADC_Set_OperationOff();
         MD_SET_REF_3030C_OFF;
-		
+		}
         this->count++;
 	}
 }
@@ -1105,7 +1244,7 @@ device_comps_t device_comps=
     calc_ntc_valve,    //float ( * const calc_ntc_valve)(struct _DEVICE_COMPONENTS  *const);//point to function calc_pt1000( device_comps_t *const this) whith param adc_result[][] 
     calc_temp,//      long  ( * const calc_temp)  (struct _DEVICE_COMPONENTS     *const);//point to function calc_temp( sensor_comp_t *const this)with param pt1000_valve
 
-   100,
+   20000,
     calc_temp_p_temp_n_average,
     calc_pt_valve,
     calc_pt_temp,
@@ -1132,15 +1271,15 @@ device_comps_t device_comps=
     
     0,//     unsigned int batt;//batt voltage
 
-    {{0},{0},{0},{0},0,0,0,0}, //struct calibration_param 
- 	{{0},{0},{0},{0},0,0,0,0},//struct calibration_param_bak 
- 	0,// cal_type
+    {{0},{0},{0},0,0,0,0}, //struct calibration_param 
+    {{0},{0},{0},0,0,0,0},//struct calibration_param_bak 
+ 	EM_CAL_PRESS,// cal_type
  	read_calibration_param,//     int (*read_calibration_param)(void *,int );
     save_calibration_param,//     int (*save_calibration_param)(void const *,int);
 
 
-    {{0},{0},{0},{0},0,0,0,0}, //struct res_calibration_param 
-    {{0},{0},{0},{0},0,0,0,0},//struct res_calibration_param_bak 
+    {{0},{0},{0},0,0,0,0}, //struct res_calibration_param 
+    {{0},{0},{0},0,0,0,0},//struct res_calibration_param_bak 
     read_res_calibration_param,//     int (*read_res_calibration_param)(void *,int );
     save_res_calibration_param,//     int (*save_res_calibration_param)(void const *,int);
 
@@ -1160,6 +1299,10 @@ device_comps_t device_comps=
     {{0},0},//unsigned char addr[7];
     read_device_addr,// int (*read_device_addr)(void *,int);
     save_device_addr,//int (*save_device_addr)(void const *,int);
+
+    {{0},0},//device_sensor_t device_sensor;
+    read_device_sensor,//int (*read_device_sensor)(void *,int);
+	save_device_sensor,//int (*save_device_sensor)(void const *,int);
 
     { MD_TIME_SEG_DATA_START_ADDR,"",0},//TimeSegData_t TimeSegData;
     read_time_seg_data_param,

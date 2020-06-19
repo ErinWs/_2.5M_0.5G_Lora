@@ -8,12 +8,6 @@
 #include "irc.h"
 #include "string.h"
 #include "stdio.h"
-
-static unsigned char cal_param_dot_bak;
-static unsigned char cal_param_unit_bak;
-
-              
-
     
 
 static struct 
@@ -376,12 +370,20 @@ static unsigned char Pro_irc(unsigned char Cmd,unsigned char *buf)
                 else 
                 {
 				    ircMisc.send_buf[i++]=(buf[9]|0x80);
-				   device_comps.cal_type=0;
+				   device_comps.cal_type=(cal_type_t)(buf[13]>>4);
+				   enter_cal_query_mode();
 				   enter_cal_modify_mode();
-				   
-				    cal_param_dot_bak=buf[13];
-				    cal_param_unit_bak=buf[14];
-				}
+				   if(device_comps.cal_type==EM_CAL_PRESS)
+				   {
+                        device_comps.calibration_param_bak.dot=buf[13]&0x0f;
+                        device_comps.calibration_param_bak.unit=buf[14];
+				   }
+				   else if(device_comps.cal_type==EM_CAL_RES)
+				   {
+                        device_comps.res_calibration_param_bak.dot=buf[13]&0x0f;
+                        device_comps.res_calibration_param_bak.unit=buf[14];
+				   }
+                }
 				
 				ircMisc.send_buf[i++]=0;
 				ircMisc.send_buf[i++]=buf[11];
@@ -613,70 +615,128 @@ static unsigned char Pro_irc(unsigned char Cmd,unsigned char *buf)
     			{
                     long param=((unsigned long)buf[14]<<24)+((unsigned long)buf[15]<<16)
                                 +((unsigned long)buf[16]<<8)+buf[17];
-                    ircMisc.send_buf[i++]=(buf[9]|0x80);           
-                    switch(buf[13])
+                    ircMisc.send_buf[i++]=(buf[9]|0x80); 
+                    if(device_comps.cal_type==EM_CAL_PRESS)
                     {
-                        case 0:
-                                    device_comps.calibration_param_bak.x[0]=device_comps.ad1_ad2_average_result;
-                                    device_comps.calibration_param_bak.y[0]=param;
-                                    mode_comps[hum_comps.current_mode].dis_option++;
-                                    hum_comps.dis_oper_mark._bit.refresh_option=1;
-                                    hum_comps.dis_oper_mark._bit.refresh_cal_param=1;
-                                    break;
-                     
-                        case 1:
-                                    device_comps.calibration_param_bak.x[1]=device_comps.ad1_ad2_average_result;
-                                    device_comps.calibration_param_bak.y[1]=param;
-                                    mode_comps[hum_comps.current_mode].dis_option++;
-                                    hum_comps.dis_oper_mark._bit.refresh_option=1;
-                                    hum_comps.dis_oper_mark._bit.refresh_cal_param=1;
-                                    break;
-                        case 2:
-                                    device_comps.calibration_param_bak.x[2]=device_comps.ad1_ad2_average_result;
-                                    device_comps.calibration_param_bak.y[2]=param;
-                                    mode_comps[hum_comps.current_mode].dis_option++;
-                                    hum_comps.dis_oper_mark._bit.refresh_option=1;
-                                    hum_comps.dis_oper_mark._bit.refresh_cal_param=1;
-                                    break;
-                        case 3:     
-                                    device_comps.calibration_param_bak.x[3]=device_comps.ad1_ad2_average_result;
-                                    device_comps.calibration_param_bak.y[3]=param;
-                                    device_comps.calibration_param_bak.is_calibrated=1;
-                                    device_comps.calibration_param_bak.dot=cal_param_dot_bak;;
-                                    device_comps.calibration_param_bak.unit=cal_param_unit_bak;
-                                    device_comps.calibration_param_bak.cs=Check_Sum_5A(&device_comps.calibration_param_bak, & device_comps.calibration_param_bak.cs-£¨unsigned char *)&device_comps.calibration_param_bak);
-                                    if(device_comps.save_calibration_param(&device_comps.calibration_param_bak,sizeof(device_comps.calibration_param_bak)))
-                    				{
-                    				    ircMisc.send_buf[i]=(buf[9]|0x90);
-                                        mode_comps[hum_comps.current_mode].dis_option=0;
+                        switch(buf[13])
+                        {
+                            case 0:
+                                        device_comps.calibration_param_bak.x[0]=device_comps.ad1_ad2_average_result;
+                                        device_comps.calibration_param_bak.y[0]=param;
+                                        mode_comps[hum_comps.current_mode].dis_option++;
                                         hum_comps.dis_oper_mark._bit.refresh_option=1;
                                         hum_comps.dis_oper_mark._bit.refresh_cal_param=1;
-                                        device_comps.calibration_param_bak.is_calibrated=0;
-                    				}
-                    				else
-                    				{
-                    					memcpy(&device_comps.calibration_param,&device_comps.calibration_param_bak,sizeof(device_comps.calibration_param_bak));
-                    					ircMisc.send_buf[i]=(buf[9]|0x80);
-                    					#if(MD_PRODUCT_NAME==MD_LORA)
-                                		  {
-                                			  enter_lora_mode();
-                                		  }
-                                          #elif (MD_PRODUCT_NAME==MD_AIR_LEAK)
-                                          {
-                                			  enter_air_leak_mode();
-                                		  }
-                                		  #elif (MD_PRODUCT_NAME==MD_NORMAL)
-                                		  {
-                                                 device_comps.max_press=0;
-                                                 enter_normal_mode();
-                                		  }
-                                		  #endif
-                                     }
-                                    
-                                    break;
-                        default:   return 1;
-                        
-                     }
+                                        break;
+                         
+                            case 1:
+                                        device_comps.calibration_param_bak.x[1]=device_comps.ad1_ad2_average_result;
+                                        device_comps.calibration_param_bak.y[1]=param;
+                                        mode_comps[hum_comps.current_mode].dis_option++;
+                                        hum_comps.dis_oper_mark._bit.refresh_option=1;
+                                        hum_comps.dis_oper_mark._bit.refresh_cal_param=1;
+                                        break;
+                            case 2:
+                                        device_comps.calibration_param_bak.x[2]=device_comps.ad1_ad2_average_result;
+                                        device_comps.calibration_param_bak.y[2]=param;
+                                        mode_comps[hum_comps.current_mode].dis_option++;
+                                        hum_comps.dis_oper_mark._bit.refresh_option=1;
+                                        hum_comps.dis_oper_mark._bit.refresh_cal_param=1;
+                                        break;
+                            case 3:     
+                                        device_comps.calibration_param_bak.x[3]=device_comps.ad1_ad2_average_result;
+                                        device_comps.calibration_param_bak.y[3]=param;
+                                        device_comps.calibration_param_bak.is_calibrated=1;
+                                        device_comps.calibration_param_bak.cs=Check_Sum_5A(&device_comps.calibration_param_bak, & device_comps.calibration_param_bak.cs-(unsigned char *)&device_comps.calibration_param_bak);
+                                        if(device_comps.save_calibration_param(&device_comps.calibration_param_bak,sizeof(device_comps.calibration_param_bak)))
+                        				{
+                        				    ircMisc.send_buf[i]=(buf[9]|0x90);
+                                            mode_comps[hum_comps.current_mode].dis_option=0;
+                                            hum_comps.dis_oper_mark._bit.refresh_option=1;
+                                            hum_comps.dis_oper_mark._bit.refresh_cal_param=1;
+                                            device_comps.calibration_param_bak.is_calibrated=0;
+                        				}
+                        				else
+                        				{
+                        					memcpy(&device_comps.calibration_param,&device_comps.calibration_param_bak,sizeof(device_comps.calibration_param_bak));
+                        					ircMisc.send_buf[i]=(buf[9]|0x80);
+                        					#if(MD_PRODUCT_NAME==MD_LORA)
+                                    		  {
+                                    			  enter_lora_mode();
+                                    		  }
+                                              #elif (MD_PRODUCT_NAME==MD_AIR_LEAK)
+                                              {
+                                    			  enter_air_leak_mode();
+                                    		  }
+                                    		  #elif (MD_PRODUCT_NAME==MD_NORMAL)
+                                    		  {
+                                                     device_comps.max_press=0;
+                                                     enter_normal_mode();
+                                    		  }
+                                    		  #endif
+                                         }
+                                        
+                                        break;
+                            default:   return 1;
+                            
+                         }
+                   }
+                   
+                   else if(device_comps.cal_type==EM_CAL_RES)
+                   {
+                        switch(buf[13])
+                        {
+                            case 0:
+                                        device_comps.res_calibration_param_bak.x[0]=device_comps.temp_p_temp_n_average_result;
+                                        device_comps.res_calibration_param_bak.y[0]=param;
+                                        mode_comps[hum_comps.current_mode].dis_option++;
+                                        hum_comps.dis_oper_mark._bit.refresh_option=1;
+                                        hum_comps.dis_oper_mark._bit.refresh_res_cal_param=1;
+                                        break;
+                         
+                            case 1:
+                                        device_comps.res_calibration_param_bak.x[1]=device_comps.temp_p_temp_n_average_result;
+                                        device_comps.res_calibration_param_bak.y[1]=param;
+                                        mode_comps[hum_comps.current_mode].dis_option++;
+                                        hum_comps.dis_oper_mark._bit.refresh_option=1;
+                                        hum_comps.dis_oper_mark._bit.refresh_res_cal_param=1;
+                                        device_comps.res_calibration_param_bak.cs=Check_Sum_5A(&device_comps.res_calibration_param_bak, & device_comps.res_calibration_param_bak.cs-(unsigned char *)&device_comps.res_calibration_param_bak);
+                                        if(device_comps.save_res_calibration_param(&device_comps.res_calibration_param_bak,sizeof(device_comps.res_calibration_param_bak)))
+                        				{
+                        				    ircMisc.send_buf[i]=(buf[9]|0x90);
+                                            mode_comps[hum_comps.current_mode].dis_option=0;
+                                            hum_comps.dis_oper_mark._bit.refresh_option=1;
+                                            hum_comps.dis_oper_mark._bit.refresh_res_cal_param=1;
+                                            device_comps.res_calibration_param_bak.is_calibrated=0;
+                        				}
+                        				else
+                        				{
+                        					memcpy(&device_comps.res_calibration_param,&device_comps.res_calibration_param_bak,sizeof(device_comps.res_calibration_param_bak));
+                        					ircMisc.send_buf[i]=(buf[9]|0x80);
+                        					#if(MD_PRODUCT_NAME==MD_LORA)
+                                    		  {
+                                    			  enter_lora_mode();
+                                    		  }
+                                              #elif (MD_PRODUCT_NAME==MD_AIR_LEAK)
+                                              {
+                                    			  enter_air_leak_mode();
+                                    		  }
+                                    		  #elif (MD_PRODUCT_NAME==MD_NORMAL)
+                                    		  {
+                                                     device_comps.max_press=0;
+                                                     enter_normal_mode();
+                                    		  }
+                                    		  #endif
+                                         }
+                                        
+                                        break;
+                            default:   return 1;
+                            
+                         }
+                   }
+                   else 
+                   {
+                        return 1;
+                   }
                 }
 				
 				ircMisc.send_buf[i++]=0;
@@ -766,8 +826,9 @@ static void Deal_irc(void)
 	unsigned char err=0;
  	do
 	{
-		DI();
+		
 		err=Check_irc_Com(ircMisc.recv_buf,ircMisc.rec_pos); 
+		DI();
 		if(err>0)
 		{
 			memcpy(ircMisc.recv_buf,ircMisc.recv_buf+err,ircMisc.rec_pos-=err);

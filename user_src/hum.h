@@ -236,6 +236,7 @@ typedef struct _HUM_COMPONENTS
                 unsigned char test_ok               :1;
                 unsigned char refresh_press_max     :1;
                 unsigned char refresh_err_code      :1;
+                unsigned char refresh_res_cal_param :1;
            
 
     	}_bit;
@@ -264,6 +265,7 @@ extern void clr_lcd(void);
 extern void enter_normal_mode(void);
 extern void enter_air_leak_mode(void);
 extern void enter_cal_modify_mode(void);
+extern void enter_cal_query_mode(void);
 extern void enter_report_mode(void);
 extern void enter_lora_mode(void);
 #endif
