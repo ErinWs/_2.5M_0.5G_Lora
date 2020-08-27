@@ -18,7 +18,7 @@
 //#define   MD_MODBUS            //modbus rs485 use irc interface,no sleep
 //#define   MD_NO_LCD
 //#define   MD_TEMP		        //temp display line 2
-#define   MD_IGNORE_ALL_ERR
+//#define   MD_IGNORE_ALL_ERR
 
 
 

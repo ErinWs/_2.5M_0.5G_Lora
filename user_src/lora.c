@@ -769,6 +769,10 @@ static unsigned char Check_lora_Com(unsigned char *Rec_Data,unsigned char Rec_Po
     	        {
     	            return 0;
     	        }
+    	        if(Rec_Data[7]>0x0f)
+    	        {
+    	            return 1;
+    	        }
     	        if(Rec_Pos<8+Rec_Data[7]+1+2)
     	        {
     	            return 0;
@@ -813,6 +817,7 @@ static unsigned char Check_lora_Com(unsigned char *Rec_Data,unsigned char Rec_Po
     	{
         	return 1;
     	}
+	return 1;
 }
 
 static void Deal_lora(void)
@@ -825,7 +830,7 @@ static void Deal_lora(void)
 		if(err>0)
 		{
 			memcpy(loraMisc.recv_buf,loraMisc.recv_buf+err,loraMisc.rec_pos-=err);
-    	}
+    		}
 		EI();
 	}
 	while (err>0);

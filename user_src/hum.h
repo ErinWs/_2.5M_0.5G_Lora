@@ -122,7 +122,7 @@
 
 
 
-#define   MD_FL_VER                      2
+#define   MD_FL_VER                      3
 typedef enum  
 {
 	EM_NORMAL_MODE=0,

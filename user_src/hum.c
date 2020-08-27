@@ -2863,7 +2863,8 @@ static void display_temp_to_line2(void)
 {
      
 	long num=device_comps.current_temp;
-	 MD_DIS_T10_CELSIUS;
+	 //MD_DIS_T10_CELSIUS;
+	 MD_DIS_T6_CELSIUS;
 	switch(num<0)
 	{
 		case 1: num=-num;
@@ -2984,7 +2985,9 @@ static void lora_mode_display(unsigned char opt)
                         hum_comps.dig2_4=rtc_valve.year&0x0f;
                         hum_comps.dig2_5=rtc_valve.year>>4;
                         display_line2_data();    // 
-                        MD_HIDE_T10_CELSIUS;MD_HIDE_T5_MPA;MD_HIDE_T2_KPA;MD_HIDE_T7_M;
+                        //MD_HIDE_T10_CELSIUS;
+                        MD_HIDE_T6_CELSIUS;
+                        MD_HIDE_T5_MPA;MD_HIDE_T2_KPA;MD_HIDE_T7_M;
                         MD_DIS_P6_DOT;
                         MD_DIS_P8_DOT;
                         hum_comps.dis_oper_mark._bit.refresh_date=0;
