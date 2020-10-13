@@ -3,7 +3,7 @@
 
 #define  MD_3_6V   0
 #define  MD_4_5V   1
-#define  MD_DEVICE_BATT          MD_3_6V
+#define  MD_DEVICE_BATT          MD_4_5V
  
 #define  MD_AIR_LEAK             0     //4.5V 
 #define  MD_LORA                 1     //3.6V
@@ -13,14 +13,28 @@
 
 #define  MD_DIS5                5
 #define  MD_DIS4                4
-#define  MD_DIS_DIG              MD_DIS5
+#define  MD_DIS_DIG              MD_DIS4
 
-//#define   MD_MODBUS            //modbus rs485 use irc interface,no sleep
-//#define   MD_NO_LCD
+#define   MD_MODBUS            //modbus rs485 use irc interface,no sleep
+#define   MD_NO_LCD
 //#define   MD_TEMP		        //temp display line 2
-//#define   MD_IGNORE_ALL_ERR
+//#define   MD_HIGH
+#define   MD_IGNORE_ALL_ERR
 
 
+#define   MD_CH0_GAIN    (0<<2)
+#define   MD_CH1_GAIN    (3<<2)
+
+
+#define   MD_E2PROM_DRIVER_ERR           (1<<0)
+#define   MD_CS123X_DRIVER_ERR           (1<<1)
+
+
+#if(MD_PRODUCT_NAME==MD_LORA)
+#define   MD_LORA_MODULE_ERR             (1<<2)
+#else
+#define   MD_LORA_MODULE_ERR             (0<<2)
+#endif
 
 
 #define   MD_ADC_MAX_POS               6
@@ -33,6 +47,8 @@
 
 
 #define MD_MEMORY_TEST_START_ADDR                      0x0000   //
+#define MD_FLOAT_LEVEL_PARAM_START_ADDR                0x0020 
+
 #define MD_CALIBRATION_PARAM_START_ADDR                0x0030   //64bytes
 #define MD_RES_CALIBRATION_PARAM_START_ADDR            0x0070   //64bytes
 #define MD_ALARM_PARAM_START_ADDR                      0x00b0   //32
@@ -41,16 +57,19 @@
 #define MD_DEVICE_ADDR_START_ADDR                      0x00f0   //16
 
 #define MD_TIME_SEG_DATA_PARAM_START_ADDR              0x0100
-#define MD_MODBUS_PARAM_START_ADDR                     0x0120
-#define MD_DEVICE_COE_START_ADDR                       0x0130
+#define MD_MODBUS_PARAM_START_ADDR                     0x0110
+#define MD_DEVICE_COE_START_ADDR                       0x0120
+
+#define MD_HIGH_CALIBRATION_PARAM_START_ADDR           0x0140
 
 
-#define MD_TIME_AIR_LEAK_PARAM_START_ADDR              0x0140
+#define MD_TIME_AIR_LEAK_PARAM_START_ADDR              0x0180
 
-#define MD_SYSTEM_TIME_START_ADDR                      0x0180
-#define MD_DEVICE_SENSOR_START_ADDR                    0x0190
+#define MD_SYSTEM_TIME_START_ADDR                      0x01c0
+#define MD_DEVICE_SENSOR_START_ADDR                    0x01d0
 
-#define MD_LORA_PARAM_START_ADDR                       0x01c0
+#define MD_LORA_PARAM_START_ADDR                       0x01e0
+
 
 
   
@@ -81,13 +100,26 @@
       unsigned char is_calibrated; 
       unsigned char cs;
   }
-  res_calibration_param_t;
+  high_calibration_param_t;
+
+  typedef struct
+    {
+        long x[4];
+        long y[4];
+        long t[4];//Temperature value for temperature compensation
+        char dot;
+        unsigned char unit;
+        unsigned char is_calibrated; 
+        unsigned char cs;
+    }
+    res_calibration_param_t;
 
 typedef enum  
 {
 	EM_CAL_PRESS=0,
 	EM_CAL_RES,
-	EM_CAL_DELTAP
+	EM_CAL_DELTAP,
+	EM_CAL_HIGH
 	//....TODO.....
 	
 }cal_type_t;
@@ -102,6 +134,12 @@ typedef enum
   }
   report_param_t;
  
+typedef struct
+{
+    long bottom_s;
+    unsigned char cs;
+}
+float_level_param_t;
 
   typedef struct
   {
@@ -209,16 +247,23 @@ typedef struct _DEVICE_COMPONENTS
     	struct{
                 unsigned char e2prom_driver_err		            :1;
                 unsigned char cs123x_driver_err		            :1;
-                unsigned char res2_err                              :1;
-                unsigned char res3_err		                        :1;
+                unsigned char lora_module_err                   :1;
+                unsigned char res1		                        :1;
+                unsigned char res2		            :1;
+                unsigned char pcf857x_driver_err		        :1;
+                unsigned char ad54x0_driver_err		            :1;
+				unsigned char res		            			:1;
+                
                 unsigned char temp_adc_stb	                    :1;
                 unsigned char isPLowRealseTriggered             :1;
                 unsigned char isPLowLessTriggered               :1;
                 unsigned char isPHighRealseTriggered            :1;
                 unsigned char isPHighOverTriggered              :1;
                 unsigned char over_range	                    :1;
+                unsigned char high_over_range	                :1;
                 unsigned char adc_busy	                        :1;
                 unsigned char adc_stb	                        :1;
+                unsigned char high_adc_stb	                    :1;
                 unsigned char batt_status                       :1;
                 unsigned char data_mode                         :1;
 
@@ -240,13 +285,20 @@ typedef struct _DEVICE_COMPONENTS
 	long  temp_n_convert_result[MD_ADC_MAX_POS];
 	unsigned int  temp_n_pos;
 	long          temp_p_temp_n_average_result;//(temp_p_convert_result-temp_n_convert_result)/temp_p_pos
+
+    long  high_p_convert_result[MD_ADC_MAX_POS];
+	unsigned int  high_p_pos;
+	long  high_n_convert_result[MD_ADC_MAX_POS];
+	unsigned int  high_n_pos;
+	long          high_p_high_n_average_result;//(high_p_convert_result-high_n_convert_result)/high_p_pos
+
 	
 	long  ad3_convert_result[MD_ADC_MAX_POS];
 	unsigned int  ad3_pos;
 	long          ad3_average_result;
 	
-	
-
+	long  current_4_20ma;
+    
 	long ntc_valve;
 	long ( * const calc_ad3_average)(struct _DEVICE_COMPONENTS  *const);
 	long ( * const calc_ntc_valve)(struct _DEVICE_COMPONENTS  *const);//point to function calc_ntc( device_comps_t *const this) whith param adc_result[][] 
@@ -259,6 +311,13 @@ typedef struct _DEVICE_COMPONENTS
 	int  current_temp;
 	int  current_temp_n_1;
 	int  current_temp_n_2;
+
+    long ( *const calc_high_p_high_n_average)(struct _DEVICE_COMPONENTS *const ); //point to calc_signal_period(sensor_comp_t *const this)
+    long ( *const calc_current_high)(struct _DEVICE_COMPONENTS *const ); //point to calc_signal_period(sensor_comp_t *const this)
+    long  current_volume;
+    long  current_high;  //Yn
+    long  current_high_n_1;//Yn-1
+    long  current_high_n_2;//Yn-2
 
 	
 	long ( *const calc_ad1_ad2_average)(struct _DEVICE_COMPONENTS *const ); //point to calc_signal_period(sensor_comp_t *const this)
@@ -273,6 +332,7 @@ typedef struct _DEVICE_COMPONENTS
         int press;
         int temp;
         long press_clr_value;
+        int  current;
         unsigned char cs;
     }coe;
     int (*read_coe)(void *,int );
@@ -292,6 +352,11 @@ typedef struct _DEVICE_COMPONENTS
     int (*read_res_calibration_param)(void *,int );
     int (*save_res_calibration_param)(void const *,int);
     
+    high_calibration_param_t  high_calibration_param;
+    high_calibration_param_t  high_calibration_param_bak;
+    int (*read_high_calibration_param)(void *,int );
+    int (*save_high_calibration_param)(void const *,int);
+
 	
     report_param_t report_param;
     int (*read_report_param)(void *,int);
@@ -325,6 +390,10 @@ typedef struct _DEVICE_COMPONENTS
 	air_leak_param_t  air_leak_param;
 	int (*read_air_leak_param)(void * , int);
 	int (*save_air_leak_param)(void const * , int);
+
+	float_level_param_t  float_level_param;
+	int (*read_float_level_param)(void * , int);
+	int (*save_float_level_param)(void const * , int);
 
 	air_leak_t air_leak;
 	

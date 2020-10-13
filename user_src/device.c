@@ -170,6 +170,16 @@ int save_res_calibration_param(void const *buf,int len )
     return _24cxx_comps.write(MD_RES_CALIBRATION_PARAM_START_ADDR,buf,len);
 }
 
+int read_high_calibration_param(void *buf,int len )
+{
+    return _24cxx_comps.read(MD_HIGH_CALIBRATION_PARAM_START_ADDR,buf,len);
+}
+int save_high_calibration_param(void const *buf,int len )
+{
+    return _24cxx_comps.write(MD_HIGH_CALIBRATION_PARAM_START_ADDR,buf,len);
+}
+
+
 static int read_device_coe(void *buf,int len )
 {
     return _24cxx_comps.read(MD_DEVICE_COE_START_ADDR,buf,len);
@@ -189,6 +199,15 @@ int read_air_leak_param(void *buf,int len )
 int save_air_leak_param(void *buf,int len )
 {
     return _24cxx_comps.write(MD_TIME_AIR_LEAK_PARAM_START_ADDR,buf,len);
+}
+int read_float_level_param(void *buf,int len )
+{
+    return _24cxx_comps.read(MD_FLOAT_LEVEL_PARAM_START_ADDR,buf,len);
+}
+
+int save_float_level_param(void *buf,int len )
+{
+    return _24cxx_comps.write(MD_FLOAT_LEVEL_PARAM_START_ADDR,buf,len);
 }
 
 int read_report_param(void *buf,int len)
@@ -245,7 +264,6 @@ return _24cxx_comps.write(MD_DEVICE_SENSOR_START_ADDR,buf,len);
  {
      unsigned int adc;
      MD_SET_BAT_CTL_ON;
-     MD_SET_REF_3030C_OFF;
      delay_us(30);
      ADCE=0;
      delay_us(2);
@@ -352,7 +370,7 @@ static int calc_temp(device_comps_t  *const this)
     HighRValue = temp_tab[cTop];
     Tem = ( ((this->ntc_valve - LowRValue)*10) / (HighRValue - LowRValue) ) + Tem0;        // 表格是以5度为一步的。
 ret:
-    Tem=Tem*this->coe.temp/10000;
+    Tem=Tem*(this->coe.temp/10000.);
     return Tem;
 }
 
@@ -461,11 +479,65 @@ ret:
 }
 
 
+
+static long calc_high_p_high_n_average(device_comps_t *const this)
+{
+    int   i=0;
+    int   j=0;
+    const int count=this->high_p_pos;
+    long  high_var;
+    long average=0;
+	long difference[32]={0};//=malloc(count*sizeof(float));
+	for(i=0;i<count;i++)
+	{
+		difference[i]=this-> high_p_convert_result[i]-this-> high_n_convert_result[i];
+	}
+    /*
+    for(i=0;i<count-1;i++)
+    {
+        for(j=0;j<count-1-i;j++)
+        {
+        	if(difference[j]>difference[j+1])
+        	{
+        		high_var=difference[j+1];
+        		difference[j+1]=difference[j];
+        		difference[j]=high_var;
+        	}
+        }
+    }
+    */
+    for(i=0;i<count;i++)
+	{
+		average+=difference[i];
+	}	
+	average=(average/(count));
+	//free (period);
+	return average;
+
+}
+
+
+static long calc_current_high(device_comps_t *const this)
+{
+    
+	long delta_y=this->high_calibration_param.y[1]-this->high_calibration_param.y[0];
+	long delta_x=this->high_calibration_param.x[1]-this->high_calibration_param.x[0];
+	long high=(long)((float)delta_y*(this->high_p_high_n_average_result-this->high_calibration_param.x[0])/delta_x)+this->high_calibration_param.y[0];
+	if(high<0) 
+	{
+		high=0;
+	}
+	return high;
+}
+
+static long calc_current_volume(device_comps_t *const this)
+{
+    
+	return this->current_high/10 *this->float_level_param.bottom_s;
+}
+
+
 /////////////////////////////////////////get press////////////////////////////////////
-
-
-
-
 
 static long  calc_ad1_ad2_average(device_comps_t *const this)
 {
@@ -502,6 +574,13 @@ static long  calc_ad1_ad2_average(device_comps_t *const this)
 
 }
 
+static long calc_current_4_20ma(device_comps_t *const this)
+{
+    long current=this->ad1_ad2_average_result/65535.*1500/47*1000;//3fix dot
+         current=current*this->coe.current/10000;
+         return current;
+
+}
 static  long calc_current_press(device_comps_t *const this)
 {
     long delta_v= this->ad1_ad2_average_result;
@@ -511,7 +590,7 @@ static  long calc_current_press(device_comps_t *const this)
     long  HighTValue;        
     int   i;
     int  Bottom=0;
-    int  Top=4-1; //cal 4 points 0-3
+    int  Top=sizeof(this->calibration_param.x)/sizeof(this->calibration_param.x[0])-1; //cal 4 points 0-3
     if (delta_v<=device_comps.calibration_param.x[Bottom])               
     {
        // Top=Bottom+1;
@@ -639,9 +718,9 @@ static unsigned char device_comps_init(device_comps_t *const this)
 	/**************START E2PROM TEST********************/
 	if(device_comps.sw._bit.e2prom_driver_err)	
 	{
-		char msg[32]="";// ep2rom low 48bytes use test
-		_24cxx_comps.write(0,"this is a e2prom driver test",strlen("this is a e2prom driver test"));
-		_24cxx_comps.read (0,msg,strlen("this is a e2prom driver test"));
+		char msg[32]="";// ep2rom low 32bytes use test
+		_24cxx_comps.write(MD_MEMORY_TEST_START_ADDR,"this is a e2prom driver test",strlen("this is a e2prom driver test"));
+		_24cxx_comps.read (MD_MEMORY_TEST_START_ADDR,msg,strlen("this is a e2prom driver test"));
 		if(!strcmp(msg,"this is a e2prom driver test"))
 		{
 			device_comps.sw._bit.e2prom_driver_err=0;	
@@ -653,7 +732,17 @@ static unsigned char device_comps_init(device_comps_t *const this)
 	}
 	if(device_comps.sw._bit.cs123x_driver_err)	
 	{
-		if(!cs123x_comps.Init(0x7c))
+        unsigned char cfg=0x70;
+        cs123x_comps.current_channel=cs123x_comps.init_channel;
+        if(cs123x_comps.current_channel==0)
+        {
+            cfg=0x70|MD_CH0_GAIN;
+        }
+        else if(cs123x_comps.current_channel==1)
+        {
+            cfg=0x71|MD_CH1_GAIN;
+        }
+		if(!cs123x_comps.Init(cfg))
 		{
             device_comps.sw._bit.cs123x_driver_err=0;
 		}
@@ -662,35 +751,26 @@ static unsigned char device_comps_init(device_comps_t *const this)
             device_comps.sw._bit.cs123x_driver_err=1;
 		}
 	}
-	/**************END E2PROM TEST********************/
-	
 
-	/***********************start other test******************************/
-	//TODO
-	/**************END other test ********************/
-	 #if(MD_PRODUCT_NAME==MD_LORA)
-		{
-			  if(!(device_comps.sw.All&0x000f)&&loraComps.sw._bit.init_ok)
-            	{
-            		return 0;
-            	}
-            	else
-            	{
-            		return 1;
-            	}
-		  }
-          #elif (MD_PRODUCT_NAME==MD_AIR_LEAK||MD_PRODUCT_NAME==MD_NORMAL)
-          {
-		if(!(device_comps.sw.All&0x000f))
-            	{
-            		return 0;
-            	}
-            	else
-            	{
-            		return 1;
-            	}
-	  }
-	 #endif
+	if(device_comps.sw._bit.lora_module_err)	
+	{
+	    if(loraComps.sw._bit.init_ok)	
+    	{
+    	    device_comps.sw._bit.lora_module_err=0;
+    	}
+	}
+
+          
+		if(!(device_comps.sw.All&0x00ff))
+    	{
+    		return 0;
+    	}
+    	else
+    	{
+    		return 1;
+    	}
+
+
 }
 
 
@@ -778,6 +858,14 @@ static void read_all_param(struct _DEVICE_COMPONENTS  *const this)
                 memset(&device_comps.res_calibration_param,0,sizeof(device_comps.res_calibration_param));
             }
         }
+        if(!read_high_calibration_param(&device_comps.high_calibration_param,sizeof(device_comps.high_calibration_param)))
+        {
+            if(device_comps.high_calibration_param.cs!=Check_Sum_5A(&device_comps.high_calibration_param, & device_comps.high_calibration_param.cs-(unsigned char *)&device_comps.high_calibration_param))
+            {
+                device_comps.high_calibration_param.is_calibrated=0;
+                memset(&device_comps.high_calibration_param,0,sizeof(device_comps.high_calibration_param));
+            }
+        }
         if(!read_air_leak_param(&device_comps.air_leak_param,sizeof(device_comps.air_leak_param)))
         {
             if(device_comps.air_leak_param.cs!=Check_Sum_5A(&device_comps.air_leak_param, & device_comps.air_leak_param.cs-(unsigned char *)&device_comps.air_leak_param))
@@ -787,12 +875,20 @@ static void read_all_param(struct _DEVICE_COMPONENTS  *const this)
             check_air_param();
            
         }
+        if(!read_float_level_param(&device_comps.float_level_param,sizeof(device_comps.float_level_param)))
+        {
+            if(device_comps.float_level_param.cs!=Check_Sum_5A(&device_comps.float_level_param, & device_comps.float_level_param.cs-(unsigned char *)&device_comps.float_level_param))
+            {
+                device_comps.float_level_param.bottom_s=1000;//1.000
+            }
+        }
         if(!device_comps.read_coe(&device_comps.coe,sizeof(device_comps.coe)))
         {
             if(device_comps.coe.cs!=Check_Sum_5A(&device_comps.coe, &device_comps.coe.cs-(unsigned char *)&device_comps.coe))
             {
                 device_comps.coe.press=10000;
                 device_comps.coe.temp=10000;
+                device_comps.coe.current=10000;
                 device_comps.coe.press_clr_value=0;
             }
             if(device_comps.coe.press<7000||device_comps.coe.press>13000)
@@ -861,109 +957,110 @@ static void read_all_param(struct _DEVICE_COMPONENTS  *const this)
     {
         device_comps.calibration_param.is_calibrated=0;
         device_comps.res_calibration_param.is_calibrated=0;
+        device_comps.high_calibration_param.is_calibrated=0;
     }
 }
 
 //only use the highlow and low_upper 
 static void pressOverloadReport(struct _DEVICE_COMPONENTS  *const this )
 {
-    long temp=0;
-    if((this->calibration_param.unit&0x0f)==this->alarm_param.unit)
-    {
-        if(this->alarm_param.press_high_lower>0)
-        {
-            temp=formatData4fixDot(this->current_press);
-            if(temp>this->alarm_param.press_high_lower)
-            {
-                this->PHihgOverTimer++;
-                this->PHihgRealseTimer=0;
-                if( this->PHihgOverTimer>=40)
-                {
-                    if(!this->sw._bit.isPHighOverTriggered)
-                    {
-                        if((device_comps.device_addr.addr[4]!=0)&&(device_comps.device_addr.addr[3]!=0))
-            	        {
-                            if(device_comps.batt>30)
-                            {
-//                                protocolComps.triggerIrq._bit.PHighOver=1;
-                                this->sw._bit.isPHighRealseTriggered=0;
-                                this->sw._bit.isPHighOverTriggered=1;
-                            }
-            	        }
-                    }
-                    this->PHihgOverTimer=0;
-                }
-            }
-            else if((temp<this->alarm_param.press_high_lower-this->alarm_param.press_high_lower/10)&&(this->sw._bit.isPHighOverTriggered))//dealt 10%
-            {
-                this->PHihgOverTimer=0;
-                this->PHihgRealseTimer++;
-                if( this->PHihgRealseTimer>=40)
-                {
-                    if(!this->sw._bit.isPHighRealseTriggered)
-                    {
-                        if((device_comps.device_addr.addr[4]!=0)&&(device_comps.device_addr.addr[3]!=0))
-            	        {
-                            if(device_comps.batt>30)
-                            {
- //                               protocolComps.triggerIrq._bit.PHighRealse=1;
-                                this->sw._bit.isPHighRealseTriggered=1;
-                                this->sw._bit.isPHighOverTriggered=0;
-                            }
-            	        }
-                    }
-                    this->PHihgRealseTimer=0;
-                }
-            }
-        }
-
-       if(this->alarm_param.press_low_upper>0)
-       {
-           if(temp<this->alarm_param.press_low_upper)
-           {
-               this->PLowLessTimer++;
-               this->PLowRealseTimer=0;
-               if( this->PLowLessTimer>=40)
-               {
-                   if(!this->sw._bit.isPLowLessTriggered)
-                   {
-                       if((device_comps.device_addr.addr[4]!=0)&&(device_comps.device_addr.addr[3]!=0))
-                       {
-                           if(device_comps.batt>30)
-                           {
-//                               protocolComps.triggerIrq._bit.PLowLess=1;
-                               this->sw._bit.isPLowRealseTriggered=0;
-                               this->sw._bit.isPLowLessTriggered=1;
-                           }
-                       }
-                   }
-                   this->PLowLessTimer=0;
-               }
-           }
-           else if((temp>this->alarm_param.press_low_upper+this->alarm_param.press_low_upper/10)&&(this->sw._bit.isPLowLessTriggered))//dealt 10%
-           {
-               this->PLowLessTimer=0;
-               this->PLowRealseTimer++;
-               if(this->PLowRealseTimer>=40)
-               {
-                   if(!this->sw._bit.isPLowRealseTriggered)
-                   {
-                       if((device_comps.device_addr.addr[4]!=0)&&(device_comps.device_addr.addr[3]!=0))
-                       {
-                           if(device_comps.batt>30)
-                           {
-    //                           protocolComps.triggerIrq._bit.PLowRealse=1;
-                               this->sw._bit.isPLowRealseTriggered=1;
-                               this->sw._bit.isPLowLessTriggered=0;
-                           }
-                       }
-                   }
-                   this->PLowRealseTimer=0;
-               }
-           }
-       }
-        
-   }
+//    long temp=0;
+//    if((this->calibration_param.unit&0x0f)==this->alarm_param.unit)
+//    {
+//        if(this->alarm_param.press_high_lower>0)
+//        {
+//            temp=formatData4fixDot(this->current_press);
+//            if(temp>this->alarm_param.press_high_lower)
+//            {
+//                this->PHihgOverTimer++;
+//                this->PHihgRealseTimer=0;
+//                if( this->PHihgOverTimer>=40)
+//                {
+//                    if(!this->sw._bit.isPHighOverTriggered)
+//                    {
+//                        if((device_comps.device_addr.addr[4]!=0)&&(device_comps.device_addr.addr[3]!=0))
+//            	        {
+//                            if(device_comps.batt>30)
+//                            {
+////                                protocolComps.triggerIrq._bit.PHighOver=1;
+//                                this->sw._bit.isPHighRealseTriggered=0;
+//                                this->sw._bit.isPHighOverTriggered=1;
+//                            }
+//            	        }
+//                    }
+//                    this->PHihgOverTimer=0;
+//                }
+//            }
+//            else if((temp<this->alarm_param.press_high_lower-this->alarm_param.press_high_lower/10)&&(this->sw._bit.isPHighOverTriggered))//dealt 10%
+//            {
+//                this->PHihgOverTimer=0;
+//                this->PHihgRealseTimer++;
+//                if( this->PHihgRealseTimer>=40)
+//                {
+//                    if(!this->sw._bit.isPHighRealseTriggered)
+//                    {
+//                        if((device_comps.device_addr.addr[4]!=0)&&(device_comps.device_addr.addr[3]!=0))
+//            	        {
+//                            if(device_comps.batt>30)
+//                            {
+// //                               protocolComps.triggerIrq._bit.PHighRealse=1;
+//                                this->sw._bit.isPHighRealseTriggered=1;
+//                                this->sw._bit.isPHighOverTriggered=0;
+//                            }
+//            	        }
+//                    }
+//                    this->PHihgRealseTimer=0;
+//                }
+//            }
+//        }
+//
+//       if(this->alarm_param.press_low_upper>0)
+//       {
+//           if(temp<this->alarm_param.press_low_upper)
+//           {
+//               this->PLowLessTimer++;
+//               this->PLowRealseTimer=0;
+//               if( this->PLowLessTimer>=40)
+//               {
+//                   if(!this->sw._bit.isPLowLessTriggered)
+//                   {
+//                       if((device_comps.device_addr.addr[4]!=0)&&(device_comps.device_addr.addr[3]!=0))
+//                       {
+//                           if(device_comps.batt>30)
+//                           {
+////                               protocolComps.triggerIrq._bit.PLowLess=1;
+//                               this->sw._bit.isPLowRealseTriggered=0;
+//                               this->sw._bit.isPLowLessTriggered=1;
+//                           }
+//                       }
+//                   }
+//                   this->PLowLessTimer=0;
+//               }
+//           }
+//           else if((temp>this->alarm_param.press_low_upper+this->alarm_param.press_low_upper/10)&&(this->sw._bit.isPLowLessTriggered))//dealt 10%
+//           {
+//               this->PLowLessTimer=0;
+//               this->PLowRealseTimer++;
+//               if(this->PLowRealseTimer>=40)
+//               {
+//                   if(!this->sw._bit.isPLowRealseTriggered)
+//                   {
+//                       if((device_comps.device_addr.addr[4]!=0)&&(device_comps.device_addr.addr[3]!=0))
+//                       {
+//                           if(device_comps.batt>30)
+//                           {
+//    //                           protocolComps.triggerIrq._bit.PLowRealse=1;
+//                               this->sw._bit.isPLowRealseTriggered=1;
+//                               this->sw._bit.isPLowLessTriggered=0;
+//                           }
+//                       }
+//                   }
+//                   this->PLowRealseTimer=0;
+//               }
+//           }
+//       }
+//        
+//   }
 
 }
 static void device_comps_task_handle(void)//Execution interval is 200 ms
@@ -995,7 +1092,7 @@ static void device_comps_task_handle(void)//Execution interval is 200 ms
 		}
 		if(this->do_init==0)
 		{
-            cs123x_comps.power_down();
+           
 			this->count=0;
 			get_batt();
 		 
@@ -1028,6 +1125,7 @@ static void device_comps_task_handle(void)//Execution interval is 200 ms
 	//if((this->do_init==0)&&(!loraComps.sw._bit.runing))
 	if(this->do_init==0)//&&(!loraComps.sw._bit.runing))
 	{
+	    int sample_en=0;
 		if(this->count==5)//every 1s calc press and temperature
 		{
             long ad1_ad3_temp=0;
@@ -1066,11 +1164,40 @@ static void device_comps_task_handle(void)//Execution interval is 200 ms
 			{
                  device_comps.sw._bit.temp_adc_stb=1;
 			}
-			
-	    
-			hum_comps.dis_oper_mark._bit.refresh_temp=1;
+		    hum_comps.dis_oper_mark._bit.refresh_temp=1;
 			hum_comps.dis_oper_mark._bit.refresh_temp_adc=1;
 			
+
+			ad1_ad3_temp=this->high_p_high_n_average_result;
+            this->high_p_high_n_average_result=this->calc_high_p_high_n_average(this);
+            this->current_high_n_2=this->current_high_n_1;
+            this->current_high_n_1=this->current_high;
+            this->current_high=this->calc_current_high(this);
+            this->current_volume=calc_current_volume(this);
+            ad1_ad3_temp-=this->high_p_high_n_average_result;
+		    if(ad1_ad3_temp<0)
+			{
+                ad1_ad3_temp=-ad1_ad3_temp;
+			}
+			if(ad1_ad3_temp>2)
+			{
+                 device_comps.sw._bit.high_adc_stb=0;
+			}
+			else
+			{
+                 device_comps.sw._bit.high_adc_stb=1;
+			}
+			if(this->current_high>this->high_calibration_param.y[1])
+			{
+				device_comps.sw._bit.high_over_range=1;
+			}
+			else
+			{
+                device_comps.sw._bit.high_over_range=0;
+			}
+		    hum_comps.dis_oper_mark._bit.refresh_high=1;
+		    hum_comps.dis_oper_mark._bit.refresh_volume=1;
+			hum_comps.dis_oper_mark._bit.refresh_high_adc=1;
 			
         
 
@@ -1085,11 +1212,13 @@ static void device_comps_task_handle(void)//Execution interval is 200 ms
 			if(ad1_ad3_temp>2)
 			{
                  device_comps.sw._bit.adc_stb=0;
+                 
+                 
 			}
 			else
 			{
                  device_comps.sw._bit.adc_stb=1;
-			}
+            }
 			this->current_press_n_2=this->current_press_n_1;
 			this->current_press_n_1=this->current_press;
 			this->current_press=this->calc_current_press(this);
@@ -1107,36 +1236,55 @@ static void device_comps_task_handle(void)//Execution interval is 200 ms
 			{
                 device_comps.sw._bit.over_range=0;
 			}
-			
-			hum_comps.dis_oper_mark._bit.refresh_press=1;
+		    hum_comps.dis_oper_mark._bit.refresh_press=1;
 			hum_comps.dis_oper_mark._bit.refresh_press_adc=1;
 
+			this->current_4_20ma=calc_current_4_20ma(this);
+
 			
-			this->ad3_pos=0;
+            this->ad3_pos=0;
 			this->ad1_pos=0;
 			this->ad2_pos=0;
 			this->temp_p_pos=0;
 			this->temp_n_pos=0;
+			this->high_p_pos=0;
+			this->high_n_pos=0;
+			
+	    }
+			
 		 
-		}
-       
-       
-        if(this->count==0||this->count==2||this->count==4)
-        {
+		 if(hum_comps.current_mode==EM_CAL_MODIFY_MODE)
+		 {
+             sample_en=1;
+		 }  
+         else
+         {
+            if(this->count==1||this->count==2)
+            {
+                sample_en=1;
+            }
+           
+         }
+         if(sample_en)
+         {
             MD_SET_REF_3030C_ON;
-            delay_us(100);//400
+	        delay_us(400);//400
             
-            cs123x_comps.restart();
-            NOP();NOP();NOP();NOP();NOP();NOP();NOP();NOP();
-            while(MD_CS123X_DATA);
-            cs123x_comps.write_reg(&this->ad1_convert_result[this->ad1_pos++],0x7d);
-            //cs123x_comps.read_adc(&this->ad1_convert_result[this->ad1_pos++]);
-            NOP();NOP();NOP();NOP();NOP();NOP();NOP();NOP();
-            while(MD_CS123X_DATA);
-            cs123x_comps.write_reg(&this->temp_p_convert_result[this->temp_p_pos++],0x7c);
-            cs123x_comps.power_down();
+//            cs123x_comps.restart();
+//            NOP();NOP();NOP();NOP();NOP();NOP();NOP();NOP();
+//            while(MD_CS123X_DATA);
+//           // cs123x_comps.write_reg(&this->ad1_convert_result[this->ad1_pos++],0x7d);
+//           cs123x_comps.write_reg(&this->high_p_convert_result[this->high_p_pos++],0x7d);
+//           this->ad1_convert_result[this->ad1_pos++]=this->high_p_convert_result[this->high_p_pos-1];
+//            //cs123x_comps.read_adc(&this->ad1_convert_result[this->ad1_pos++]);
+//            NOP();NOP();NOP();NOP();NOP();NOP();NOP();NOP();
+//            while(MD_CS123X_DATA);
+//            cs123x_comps.write_reg(&this->temp_p_convert_result[this->temp_p_pos++],0x70);
+//            cs123x_comps.power_down();
 
-        
+            cs123x_comps.sw._bit.running=1;
+            cs123x_comps.restart();
+            cs123x_comps.enable_interrupt();
 
         
        
@@ -1193,7 +1341,7 @@ static void device_comps_task_handle(void)//Execution interval is 200 ms
         
       */ 
 	//R_ADC_Set_OperationOff();
-        MD_SET_REF_3030C_OFF;
+     //  MD_SET_REF_3030C_OFF;
 		}
         this->count++;
 	}
@@ -1214,7 +1362,7 @@ device_comps_t device_comps=
     0,//    unsigned long count;            //Called counter
 
 
-    {3}, //union sw;  e2prom fault +cs123x err
+    {MD_E2PROM_DRIVER_ERR+MD_CS123X_DRIVER_ERR+MD_LORA_MODULE_ERR},  //union sw;  e2prom fault +cs123x err }, 
     
    0, //int PHihgOverTimer;
    0,// int PHihgRealseTimer;
@@ -1232,11 +1380,18 @@ device_comps_t device_comps=
 	{0},//unsigned int  temp_n_convert_result[MD_ADC_MAX_POS];
 	0,//unsigned int  temp_n_pos;
 	0,//long          temp_p_temp_n_average_result;//(temp_p_convert_result-temp_n_convert_result)/temp_p_pos
-	
+
+   {0},  //long  high_p_convert_result[MD_ADC_MAX_POS];
+  0, // unsigned int  high_p_pos;
+   {0}, //long  high_n_convert_result[MD_ADC_MAX_POS];
+   0, //unsigned int  high_n_pos;
+   0,// long          high_p_high_n_average_result;//(high_p_convert_result-high_n_convert_result)/high_p_pos
+
     {0}, //  unsigned int  ad3_convert_result[MD_ADC_MAX_POS];
     0, // unsigned int  ad3_pos;
     0,//unsigned long ad3_average_result
 
+    0,//long current_4_20ma;
 
 
     10000,//     float ntc_valve;
@@ -1252,6 +1407,13 @@ device_comps_t device_comps=
     0,//     long  current_temp_n_1;
     0,//     long  current_temp_n_2;
 
+    calc_high_p_high_n_average,//long ( *const calc_high_p_high_n_average)(struct _DEVICE_COMPONENTS *const ); //point to calc_signal_period(sensor_comp_t *const this)
+    calc_current_high,//long ( *const calc_current_high)(struct _DEVICE_COMPONENTS *const ); //point to calc_signal_period(sensor_comp_t *const this)
+    0,//long  current_volume
+    0,//long  current_high;  //Yn
+    0,//long  current_high_n_1;//Yn-1
+    0,//long  current_high_n_2;//Yn-2    
+
    
 	calc_ad1_ad2_average,//long ( *const calc_ad1_ad2_average)(struct _DEVICE_COMPONENTS *const ); //point to calc_signal_period(sensor_comp_t *const this)
 	calc_current_press,//     unsigned long ( *const calc_current_press)(struct _DEVICE_COMPONENTS *const ); //point to calc_signal_period(sensor_comp_t *const this)
@@ -1261,8 +1423,8 @@ device_comps_t device_comps=
     0,//     long  current_press_n_2;//Yn-2
 
     {           //struct 
-        10000,  //{ int press;
-        10000,   //  int temp;  
+                //{ int press;
+               //  int temp;  
         0        //   long press_clr_value 
     },         //}coe;
     read_device_coe,
@@ -1282,6 +1444,12 @@ device_comps_t device_comps=
     {{0},{0},{0},0,0,0,0},//struct res_calibration_param_bak 
     read_res_calibration_param,//     int (*read_res_calibration_param)(void *,int );
     save_res_calibration_param,//     int (*save_res_calibration_param)(void const *,int);
+
+    {{0},{0},{0},0,0,0,0}, //high_calibration_param_t  high_calibration_param;
+    {{0},{0},{0},0,0,0,0},//high_calibration_param_t  high_calibration_param_bak;
+    read_high_calibration_param,//int (*read_high_calibration_param)(void *,int );
+     save_high_calibration_param,//  int (*save_high_calibration_param)(void const *,int);
+    
 
     {0},   //struct report_parm;
     read_report_param,//  int (*read_report_param)(void *,int);
@@ -1315,6 +1483,10 @@ device_comps_t device_comps=
     {0},
     read_air_leak_param,
     save_air_leak_param,
+
+    {0},//float_level_param_t  float_level_param;
+	read_float_level_param,// int(*read_float_level_param)(void * , int);
+	save_float_level_param,//int (*save_float_level_param)(void const * , int);
 
     { {0},
       0

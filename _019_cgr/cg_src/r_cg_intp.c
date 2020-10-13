@@ -23,7 +23,7 @@
 * Device(s)    : R7F0C019L
 * Tool-Chain   : CA78K0R
 * Description  : This file implements device driver for INTP module.
-* Creation Date: 2020/1/13 星期一
+* Creation Date: 2020/9/15 星期二
 ***********************************************************************************************************************/
 
 /***********************************************************************************************************************
@@ -74,8 +74,14 @@ void R_INTC_Create(void)
     /* Set INTP0 low priority */
     PPR10 = 1U;
     PPR00 = 1U;
-    EGN0 = _01_INTP0_EDGE_FALLING_SEL;
+    /* Set INTP7 low priority */
+    PPR17 = 1U;
+    PPR07 = 1U;
+    EGN0 = _01_INTP0_EDGE_FALLING_SEL | _80_INTP7_EDGE_FALLING_SEL;
     EGP0 = _01_INTP0_EDGE_RISING_SEL;
+    /* Set INTP7 pin */
+    PFSEG5 &= 0xBFU;
+    PM0 |= 0x04U;
 }
 
 /***********************************************************************************************************************
@@ -99,6 +105,28 @@ void R_INTC0_Stop(void)
 {
     PMK0 = 1U;    /* disable INTP0 interrupt */
     PIF0 = 0U;    /* clear INTP0 interrupt flag */
+}
+/***********************************************************************************************************************
+* Function Name: R_INTC7_Start
+* Description  : This function clears INTP7 interrupt flag and enables interrupt.
+* Arguments    : None
+* Return Value : None
+***********************************************************************************************************************/
+void R_INTC7_Start(void)
+{
+    PIF7 = 0U;    /* clear INTP7 interrupt flag */
+    PMK7 = 0U;    /* enable INTP7 interrupt */
+}
+/***********************************************************************************************************************
+* Function Name: R_INTC7_Stop
+* Description  : This function disables INTP7 interrupt and clears interrupt flag.
+* Arguments    : None
+* Return Value : None
+***********************************************************************************************************************/
+void R_INTC7_Stop(void)
+{
+    PMK7 = 1U;    /* disable INTP7 interrupt */
+    PIF7 = 0U;    /* clear INTP7 interrupt flag */
 }
 
 /* Start user code for adding. Do not edit comment generated here */

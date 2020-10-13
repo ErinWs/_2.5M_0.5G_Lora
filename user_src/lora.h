@@ -38,6 +38,7 @@ typedef struct _LORA_COMPONENTS
 	unsigned long count;            //Called counter
  
 	unsigned char *const recv_base_pt;//Passed to uart recv  point
+	unsigned char *const send_base_pt;//Passed to uart send  point
 	unsigned char *const recv_pos_pt;
 	unsigned short       op_window_time; 
 

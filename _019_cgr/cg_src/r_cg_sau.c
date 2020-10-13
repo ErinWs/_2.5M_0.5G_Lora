@@ -23,7 +23,7 @@
 * Device(s)    : R7F0C019L
 * Tool-Chain   : CA78K0R
 * Description  : This file implements device driver for SAU module.
-* Creation Date: 2020/1/13 星期一
+* Creation Date: 2020/9/15 星期二
 ***********************************************************************************************************************/
 
 /***********************************************************************************************************************
@@ -237,7 +237,7 @@ void R_UART2_Create(void)
     SRIF2 = 0U;    /* clear INTSR2 interrupt flag */
     SREMK2 = 1U;   /* disable INTSRE2 interrupt */
     SREIF2 = 0U;   /* clear INTSRE2 interrupt flag */
-    /* Set INTST2 low priority */
+    /* Set INTST2 level2 priority */
     STPR12 = 1U;
     STPR02 = 0U;
     /* Set INTSR2 low priority */

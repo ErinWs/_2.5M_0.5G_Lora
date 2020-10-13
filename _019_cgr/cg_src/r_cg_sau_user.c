@@ -23,7 +23,7 @@
 * Device(s)    : R7F0C019L
 * Tool-Chain   : CA78K0R
 * Description  : This file implements device driver for SAU module.
-* Creation Date: 2020/1/13 星期一
+* Creation Date: 2020/9/15 星期二
 ***********************************************************************************************************************/
 
 /***********************************************************************************************************************
@@ -96,7 +96,11 @@ __interrupt static void r_uart0_interrupt_receive(void)
 	   modbusComps.recv_base_pt[*modbusComps.recv_pos_pt]=rx_data;
 	  *modbusComps.recv_pos_pt+=1;
 	  *modbusComps.recv_pos_pt&=0x3f;
+
 	  
+	   modbusComps.recv_cfg_base_pt[*modbusComps.recv_cfg_pos_pt]=rx_data;
+	  *modbusComps.recv_cfg_pos_pt+=1;
+	  *modbusComps.recv_cfg_pos_pt&=0x3f;
    /* uint8_t rx_data;
     uint8_t err_type;
     
@@ -219,7 +223,6 @@ static void r_uart0_callback_error(uint8_t err_type)
 ***********************************************************************************************************************/
 __interrupt static void r_uart2_interrupt_receive(void)
 {
-
     uint8_t rx_data;
     uint8_t err_type;
     

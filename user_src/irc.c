@@ -96,29 +96,33 @@ unsigned char Check_Sum_5A(unsigned char const *Data,unsigned char Len)
     return Sum;
 }
 
-long formatData4fixDot(long temp)
+long formatData4fixDot(long temp,int dot)
 {
-    if(device_comps.calibration_param.dot==5)
+    if(dot==6)
+    {
+        temp/=100;
+    }
+    else if(dot==5)
     {
         temp/=10;
     }
-    else if(device_comps.calibration_param.dot==4)
+    else if(dot==4)
     {
         temp/=1;
     }
-    else if(device_comps.calibration_param.dot==3)
+    else if(dot==3)
     {
         temp*=10;
     }
-    else if(device_comps.calibration_param.dot==2)
+    else if(dot==2)
     {
         temp*=100;
     }
-    else if(device_comps.calibration_param.dot==1)
+    else if(dot==1)
     {
         temp*=1000;
     }
-    else if(device_comps.calibration_param.dot==0)
+    else if(dot==0)
     {
         temp*=10000;
     }
@@ -135,6 +139,8 @@ long formatData4fixDot(long temp)
 #define  MD_DATA_ID_READ_MEASURE_INFO       0x901f
 #define  MD_DATA_ID_READ_ACCESS_ADDR        0x9023
 #define  MD_DATA_ID_READ_LORA_PARAM         0x9024
+#define  MD_DATA_ID_READ_HIGH_INFO          0x9026
+
 
 #define  MD_DATA_ID_SET_DEVICE_ADDR         0x9018
 #define  MD_DATA_ID_SET_ACCESS_ADDR         0x9005
@@ -259,6 +265,7 @@ static unsigned char Pro_irc(unsigned char Cmd,unsigned char *buf)
 					
                     ircMisc.send_buf[i++]=loraComps.yl701_info_p->rate;//9600
                     ircMisc.send_buf[i++]=loraComps.yl701_info_p->verify;//no even
+                    
                     ircMisc.send_buf[i++]=loraComps.yl701_info_p->freq>>16;
                     ircMisc.send_buf[i++]=loraComps.yl701_info_p->freq>>8;
                     ircMisc.send_buf[i++]=loraComps.yl701_info_p->freq;
@@ -285,13 +292,13 @@ static unsigned char Pro_irc(unsigned char Cmd,unsigned char *buf)
 					ircMisc.send_buf[i++]=buf[12];
 					                                        //add full range ...
 					
-					temp=formatData4fixDot(device_comps.calibration_param.y[3]);
+					temp=formatData4fixDot(device_comps.calibration_param.y[3],device_comps.calibration_param.dot);
 					ircMisc.send_buf[i++]=temp>>24;
 					ircMisc.send_buf[i++]=temp>>16;
 					ircMisc.send_buf[i++]=temp>>8;
 					ircMisc.send_buf[i++]=temp;
 					                                         //current p
-					temp=formatData4fixDot(device_comps.current_press);                                        
+					temp=formatData4fixDot(device_comps.current_press,device_comps.calibration_param.dot);                                        
 					ircMisc.send_buf[i++]=temp>>24;
 					ircMisc.send_buf[i++]=temp>>16;
 					ircMisc.send_buf[i++]=temp>>8;
@@ -316,7 +323,44 @@ static unsigned char Pro_irc(unsigned char Cmd,unsigned char *buf)
 					ircMisc.send_buf[i++]=0x16;
 					VerifyResult=0;
 					break;
-				
+			case MD_DATA_ID_READ_HIGH_INFO:                //HIGH info
+					ircMisc.send_buf[i++]=(buf[9]|0x80);
+					ircMisc.send_buf[i++]=0;//Length
+					ircMisc.send_buf[i++]=buf[11];//dataID
+					ircMisc.send_buf[i++]=buf[12];
+					                                        //add full range ...
+					
+					temp=formatData4fixDot(device_comps.high_calibration_param.y[1],device_comps.high_calibration_param.dot);
+					ircMisc.send_buf[i++]=temp>>24;
+					ircMisc.send_buf[i++]=temp>>16;
+					ircMisc.send_buf[i++]=temp>>8;
+					ircMisc.send_buf[i++]=temp;
+					                                         
+					temp=formatData4fixDot(device_comps.current_high,device_comps.high_calibration_param.dot);                                        
+					ircMisc.send_buf[i++]=temp>>24;
+					ircMisc.send_buf[i++]=temp>>16;
+					ircMisc.send_buf[i++]=temp>>8;
+					ircMisc.send_buf[i++]=temp;
+					temp=formatData4fixDot(device_comps.current_high,device_comps.high_calibration_param.dot+2); //v=S*H H/=10,S:3 fix dot                                       
+					ircMisc.send_buf[i++]=temp>>24;
+					ircMisc.send_buf[i++]=temp>>16;
+					ircMisc.send_buf[i++]=temp>>8;
+					ircMisc.send_buf[i++]=temp;
+					
+		             ircMisc.send_buf[i++]=device_comps.current_temp>>8;
+		            ircMisc.send_buf[i++]=device_comps.current_temp;
+
+		            ircMisc.send_buf[i++]=device_comps.batt;
+
+		            ircMisc.send_buf[i++]=0;//device status
+					
+					
+					///ADD Other Data
+					ircMisc.send_buf[10]=i-11;
+					ircMisc.send_buf[i++]=Check_Sum(ircMisc.send_buf,i);
+					ircMisc.send_buf[i++]=0x16;
+					VerifyResult=0;
+					break;	
 			case MD_DATA_ID_READ_ACCESS_ADDR:                //read access addr
 					ircMisc.send_buf[i++]=(buf[9]|0x80);
 					ircMisc.send_buf[i++]=0;//Length
@@ -382,6 +426,11 @@ static unsigned char Pro_irc(unsigned char Cmd,unsigned char *buf)
 				   {
                         device_comps.res_calibration_param_bak.dot=buf[13]&0x0f;
                         device_comps.res_calibration_param_bak.unit=buf[14];
+				   }
+				   else if(device_comps.cal_type==EM_CAL_HIGH)
+				   {
+                        device_comps.high_calibration_param_bak.dot=buf[13]&0x0f;
+                        device_comps.high_calibration_param_bak.unit=buf[14];
 				   }
                 }
 				
@@ -570,8 +619,9 @@ static unsigned char Pro_irc(unsigned char Cmd,unsigned char *buf)
     			else 
     			{
 					yl701_info_t yl701_info_cpy;
-					yl701_info_cpy.rate=buf[13];
-					yl701_info_cpy.verify=buf[14];
+					yl701_info_cpy.rate=buf[13]=4;
+					yl701_info_cpy.verify=buf[14]=0;
+					
 					yl701_info_cpy.freq=((unsigned long)buf[15]<<16)+((unsigned long)buf[16]<<8)+buf[17];
 					yl701_info_cpy.sf=buf[18];
                     yl701_info_cpy.workMode=buf[19];
@@ -724,6 +774,57 @@ static unsigned char Pro_irc(unsigned char Cmd,unsigned char *buf)
                                     		  {
                                                      device_comps.max_press=0;
                                                      enter_normal_mode();
+                                    		  }
+                                    		  #endif
+                                         }
+                                        
+                                        break;
+                            default:   return 1;
+                            
+                         }
+                   }
+                   else if(device_comps.cal_type==EM_CAL_HIGH)
+                   {
+                        switch(buf[13])
+                        {
+                            case 0:
+                                        device_comps.high_calibration_param_bak.x[0]=device_comps.high_p_high_n_average_result;
+                                        device_comps.high_calibration_param_bak.y[0]=param;
+                                        mode_comps[hum_comps.current_mode].dis_option++;
+                                        hum_comps.dis_oper_mark._bit.refresh_option=1;
+         				hum_comps.dis_oper_mark._bit.refresh_high_cal_param=1;
+                                        break;
+                         
+                            case 1:
+                                        device_comps.high_calibration_param_bak.x[1]=device_comps.high_p_high_n_average_result;
+                                        device_comps.high_calibration_param_bak.y[1]=param;
+                                        mode_comps[hum_comps.current_mode].dis_option++;
+                                        hum_comps.dis_oper_mark._bit.refresh_option=1;
+                                        hum_comps.dis_oper_mark._bit.refresh_high_cal_param=1;
+                                        device_comps.high_calibration_param_bak.cs=Check_Sum_5A(&device_comps.high_calibration_param_bak, & device_comps.high_calibration_param_bak.cs-(unsigned char *)&device_comps.high_calibration_param_bak);
+                                        if(device_comps.save_high_calibration_param(&device_comps.high_calibration_param_bak,sizeof(device_comps.high_calibration_param_bak)))
+                        				{
+                        				    ircMisc.send_buf[i]=(buf[9]|0x90);
+                                            mode_comps[hum_comps.current_mode].dis_option=0;
+                                            hum_comps.dis_oper_mark._bit.refresh_option=1;
+                                            hum_comps.dis_oper_mark._bit.refresh_high_cal_param=1;
+                                            device_comps.high_calibration_param_bak.is_calibrated=0;
+                        				}
+                        				else
+                        				{
+                        					memcpy(&device_comps.high_calibration_param,&device_comps.high_calibration_param_bak,sizeof(device_comps.high_calibration_param_bak));
+								ircMisc.send_buf[i]=(buf[9]|0x80);
+                        					#if(MD_PRODUCT_NAME==MD_LORA)
+                                    		  {
+                                    			  enter_lora_mode();
+                                    		  }
+                                              #elif (MD_PRODUCT_NAME==MD_AIR_LEAK)
+                                              {
+                                    			  enter_air_leak_mode();
+                                    		  }
+                                    		  #elif (MD_PRODUCT_NAME==MD_NORMAL)
+                                    		  {
+                                                   enter_normal_mode();
                                     		  }
                                     		  #endif
                                          }

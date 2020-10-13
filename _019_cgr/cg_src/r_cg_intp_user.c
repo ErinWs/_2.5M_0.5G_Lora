@@ -23,13 +23,14 @@
 * Device(s)    : R7F0C019L
 * Tool-Chain   : CA78K0R
 * Description  : This file implements device driver for INTP module.
-* Creation Date: 2020/1/13 星期一
+* Creation Date: 2020/9/15 星期二
 ***********************************************************************************************************************/
 
 /***********************************************************************************************************************
 Pragma directive
 ***********************************************************************************************************************/
 #pragma interrupt INTP0 r_intc0_interrupt
+#pragma interrupt INTP7 r_intc7_interrupt
 /* Start user code for pragma. Do not edit comment generated here */
 /* End user code. Do not edit comment generated here */
 
@@ -41,6 +42,7 @@ Includes
 /* Start user code for include. Do not edit comment generated here */
 #include "r_cg_sau.h"
 #include "lora.h"
+#include "cs123x.h"
 /* End user code. Do not edit comment generated here */
 #include "r_cg_userdefine.h"
 
@@ -87,6 +89,20 @@ __interrupt static void r_intc0_interrupt(void)
        //     enter_cad_mode();
       //  }
     //}
+    /* End user code. Do not edit comment generated here */
+}
+/***********************************************************************************************************************
+* Function Name: r_intc7_interrupt
+* Description  : None
+* Arguments    : None
+* Return Value : None
+***********************************************************************************************************************/
+__interrupt static void r_intc7_interrupt(void)
+{
+    /* Start user code. Do not edit comment generated here */
+    cs123x_comps.sw._bit.adc_updated=1;
+    cs123x_comps.disale_interrup();
+    cs123x_comps.task_handle();
     /* End user code. Do not edit comment generated here */
 }
 

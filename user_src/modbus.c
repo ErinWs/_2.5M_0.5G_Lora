@@ -1,9 +1,11 @@
+
 #include "r_cg_macrodriver.h"
 #include "r_cg_userdefine.h"
 #include "r_cg_sau.h"
 #include "device.h"
 #include "r_cg_macrodriver.h"
 #include "r_cg_userdefine.h"
+#include "r_cg_intp.h"
 #include "r_cg_sau.h"
 #include "r_cg_tau.h"
 #include "24cxx.h"
@@ -22,6 +24,11 @@ static struct
 	unsigned char  send_buf[128];
 	unsigned char  recv_buf[64];
 	unsigned char  rec_pos;
+	
+    unsigned char  recv_cfg_buf[64];
+    unsigned char  send_cfg_buf[64];
+	unsigned char  rec_cfg_pos;
+	
 	modebs_param_t param;
 }
 modbusMisc=
@@ -29,6 +36,9 @@ modbusMisc=
 	{0},
 	{0},
 	 0,
+	 
+	{0},
+	 0, 
 	 
     {0}
 };
@@ -107,7 +117,7 @@ static unsigned char Pro_modbus(unsigned char Cmd,unsigned char *buf,int len)
 		{
             modbusMisc.send_buf[i++]=modbusMisc.param.addr;
             modbusMisc.send_buf[i++]=Cmd;
-            modbusMisc.send_buf[i++]=num*2;//length
+            modbusMisc.send_buf[i++]=4*2;//length
             memcpy(&modbusMisc.send_buf[i],&device_comps.device_sensor.ser_num[0],sizeof(device_comps.device_sensor.ser_num));
             i+=sizeof(device_comps.device_sensor.ser_num);
             crc=generateCRC(modbusMisc.send_buf, i);
@@ -116,14 +126,9 @@ static unsigned char Pro_modbus(unsigned char Cmd,unsigned char *buf,int len)
 	    modbusComps.write(modbusMisc.send_buf,i);
             return 8;
 		}
-		else
+		else if((addr<10)&&(num+addr<11))
 		{
-    		if((addr>9)||(num+addr>10))
-    		{
-    		    return 1;
-    		}
-    		else
-    		{
+    		
                 modbusMisc.send_buf[i++]=modbusMisc.param.addr;
                 modbusMisc.send_buf[i++]=Cmd;
                 modbusMisc.send_buf[i++]=num*2;//length
@@ -159,7 +164,44 @@ static unsigned char Pro_modbus(unsigned char Cmd,unsigned char *buf,int len)
                 modbusMisc.send_buf[i++]=crc>>8;
                 modbusComps.write(modbusMisc.send_buf,i);
     		    return 8;
-             }
+             
+         }
+         else if((addr>0x2f)&&(addr<0x32)&&(num+addr<0x33))
+         {
+            modbusMisc.send_buf[i++]=modbusMisc.param.addr;
+            modbusMisc.send_buf[i++]=Cmd;
+            modbusMisc.send_buf[i++]=num*2;//length
+            for(k=0;k<num;k++)
+            {
+                if(addr==0x30)
+                {
+                    modbusMisc.send_buf[i++] =device_comps.coe.current>>8;
+                    modbusMisc.send_buf[i++] =device_comps.coe.current;
+                    addr++;
+                }
+                else if(addr==0x31)//
+                {
+                    
+                    modbusMisc.send_buf[i++] =device_comps.current_4_20ma>>8;
+                    modbusMisc.send_buf[i++] =device_comps.current_4_20ma;
+                    addr++;
+                }
+                else
+                {
+                    return 1;
+                }   
+            }
+            crc=generateCRC(modbusMisc.send_buf, i);
+            modbusMisc.send_buf[i++]=crc;
+            modbusMisc.send_buf[i++]=crc>>8;
+            modbusComps.write(modbusMisc.send_buf,i);
+            return 8;
+
+         
+         }
+         else 
+         {
+            return 1;
          }
     }
 	else if(Cmd==6)//Write
@@ -215,6 +257,15 @@ static unsigned char Pro_modbus(unsigned char Cmd,unsigned char *buf,int len)
         			 device_comps.save_coe(&device_comps.coe,sizeof(device_comps.coe));
     			}
                  break;
+            case 0x30:                //current_coe
+		        tmp=((unsigned int)buf[4]<<8)+buf[5];
+		        if(tmp>=7000&&tmp<=13000)
+		        {
+                     device_comps.coe.current=tmp;
+                     device_comps.coe.cs=Check_Sum_5A(&device_comps.coe, &device_comps.coe.cs-(unsigned char *)&device_comps.coe);
+        			 device_comps.save_coe(&device_comps.coe,sizeof(device_comps.coe));
+    			}
+                 break;     
 		   default:       
 					return 1;	
 		}
@@ -249,6 +300,7 @@ static unsigned char Pro_modbus(unsigned char Cmd,unsigned char *buf,int len)
 	return 1;
 	
 }
+
 static unsigned char Check_modbus_Com(unsigned char *Rec_Data,unsigned char Rec_Pos)
 {
     int len;
@@ -296,6 +348,97 @@ static unsigned char Check_modbus_Com(unsigned char *Rec_Data,unsigned char Rec_
 }
 
 
+static unsigned char pro_modbus_config(unsigned char cmd,unsigned char *buf,int len)
+{
+    int i=0;
+    yl701_info_t yl701_info_cpy;
+    switch(cmd)
+    {
+        case 0x01://write all param
+            yl701_info_cpy.rate=buf[8]=4;
+            yl701_info_cpy.verify=buf[9]=0;
+            yl701_info_cpy.freq=((unsigned long)buf[10]<<16)+((unsigned long)buf[11]<<8)+buf[12];
+            yl701_info_cpy.sf=buf[13];
+            yl701_info_cpy.workMode=buf[14];
+            yl701_info_cpy.bw=buf[15];
+            yl701_info_cpy.NodeId=((unsigned long)buf[16]<<8)+buf[17];
+            yl701_info_cpy.netId=buf[18];
+            yl701_info_cpy.power=buf[19];
+            yl701_info_cpy.breathPeriod=buf[20];
+            yl701_info_cpy.breathTime=buf[21];
+            yl701_info_cpy.cs=Check_Sum_5A(&yl701_info_cpy, &yl701_info_cpy.cs-(unsigned char *)&yl701_info_cpy);
+            if(loraComps.save_yl701_info(&yl701_info_cpy,sizeof(yl701_info_cpy)))
+            {
+                    
+            }
+            else
+            {
+                memcpy(loraComps.yl701_info_p,&yl701_info_cpy,sizeof(yl701_info_cpy));
+            	
+            }
+            
+        case 0x02:
+            memcpy(loraComps.send_base_pt,buf,len);
+            MD_LORA_INTP_DISABLE();
+            loraComps.work_st.mode=EM_CFG;
+            loraComps.op_window_time=10;
+            loraComps.write(loraComps.send_base_pt,len);
+            return len;
+
+        default:
+              return 1;
+
+     }
+     return 1;
+ }
+ 
+static unsigned char Check_Sum(unsigned char *Data,unsigned char Len)
+{
+	unsigned char Sum=0;
+	unsigned char i=0;
+	for(i=0;i<Len;i++)
+	{
+		Sum+=Data[i];
+	}
+	return Sum;
+}
+
+static unsigned char Check_modbus_cfg_Com(unsigned char *Rec_Data,unsigned char Rec_Pos)
+{
+    if(Rec_Pos<5)
+	{
+		return 0;
+	}
+    if((Rec_Data[0]==0xaf)&&(Rec_Data[1]==0xaf)&&(Rec_Data[2]==0)&&
+	(Rec_Data[3]==0)&&(Rec_Data[4]==0xaf))
+	{
+        if(Rec_Pos<8)
+        {
+            return 0;
+        }
+        if(Rec_Data[7]>0x0f)
+        {
+            return 1;
+        }
+        if(Rec_Pos<8+Rec_Data[7]+1+2)
+        {
+            return 0;
+        }
+        if((Rec_Data[8+Rec_Data[7]+1+2-2]!=0x0d)||(Rec_Data[8+Rec_Data[7]+1+2-1]!=0x0a))
+        {
+            return 1;
+        }
+        if(Rec_Data[8+Rec_Data[7]+1+2-3]!=Check_Sum(Rec_Data,8+Rec_Data[7]))
+        {
+            return 1;
+        }
+        return pro_modbus_config(Rec_Data[6],Rec_Data,8+Rec_Data[7]+1+2);
+	}
+	return 1;
+}
+
+
+
 static void Deal_modbus(void)
 {
 	unsigned char err=0;
@@ -306,6 +449,18 @@ static void Deal_modbus(void)
 		if(err>0)
 		{
 			memcpy(modbusMisc.recv_buf,modbusMisc.recv_buf+err,modbusMisc.rec_pos-=err);
+    	}
+		EI();
+	}
+    while (err>0);
+
+    do
+	{
+		DI();
+		err=Check_modbus_cfg_Com(modbusMisc.recv_cfg_buf,modbusMisc.rec_cfg_pos); 
+		if(err>0)
+		{
+			memcpy(modbusMisc.recv_cfg_buf,modbusMisc.recv_cfg_buf+err,modbusMisc.rec_cfg_pos-=err);
     	}
 		EI();
 	}
@@ -358,6 +513,11 @@ modbusComps_t modbusComps=
     modbusMisc.recv_buf,
     &modbusMisc.rec_pos,
     30,
+    
+    modbusMisc.recv_cfg_buf,
+    modbusMisc.send_cfg_buf,
+    &modbusMisc.rec_cfg_pos,
+    
     &modbusMisc.param,
     {0},
 

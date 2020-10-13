@@ -236,7 +236,13 @@ typedef struct _HUM_COMPONENTS
                 unsigned char test_ok               :1;
                 unsigned char refresh_press_max     :1;
                 unsigned char refresh_err_code      :1;
+                
                 unsigned char refresh_res_cal_param :1;
+                unsigned char refresh_high_cal_param :1;
+                unsigned char refresh_high          :1;
+                unsigned char refresh_volume         :1;
+                unsigned char refresh_high_adc	    :1;
+                unsigned char refresh_param_modifyed	    :1;
            
 
     	}_bit;

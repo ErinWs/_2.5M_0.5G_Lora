@@ -23,7 +23,7 @@
 * Device(s)    : R7F0C019L
 * Tool-Chain   : CA78K0R
 * Description  : This file includes user definition.
-* Creation Date: 2020/1/13 星期一
+* Creation Date: 2020/9/15 星期二
 ***********************************************************************************************************************/
 #ifndef _USER_DEF_H
 #define _USER_DEF_H

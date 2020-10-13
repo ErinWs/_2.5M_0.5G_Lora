@@ -23,7 +23,7 @@
 * Device(s)    : R7F0C019L
 * Tool-Chain   : CA78K0R
 * Description  : This file implements device driver for INTP module.
-* Creation Date: 2020/1/13 星期一
+* Creation Date: 2020/9/15 星期二
 ***********************************************************************************************************************/
 #ifndef INTP_H
 #define INTP_H
@@ -87,6 +87,8 @@ Global functions
 void R_INTC_Create(void);
 void R_INTC0_Start(void);
 void R_INTC0_Stop(void);
+void R_INTC7_Start(void);
+void R_INTC7_Stop(void);
 
 /* Start user code for function. Do not edit comment generated here */
 /* End user code. Do not edit comment generated here */
