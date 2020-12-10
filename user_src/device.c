@@ -578,6 +578,10 @@ static long calc_current_4_20ma(device_comps_t *const this)
 {
     long current=this->ad1_ad2_average_result/65535.*1500/47*1000;//3fix dot
          current=current*this->coe.current/10000;
+         if(current<0)
+         {
+            current=0;
+         }
          return current;
 
 }

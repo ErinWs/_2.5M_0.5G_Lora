@@ -3,7 +3,7 @@
 
 #define  MD_3_6V   0
 #define  MD_4_5V   1
-#define  MD_DEVICE_BATT          MD_4_5V
+#define  MD_DEVICE_BATT          MD_3_6V
  
 #define  MD_AIR_LEAK             0     //4.5V 
 #define  MD_LORA                 1     //3.6V
@@ -15,11 +15,11 @@
 #define  MD_DIS4                4
 #define  MD_DIS_DIG              MD_DIS4
 
-#define   MD_MODBUS            //modbus rs485 use irc interface,no sleep
-#define   MD_NO_LCD
+//#define   MD_MODBUS            //modbus rs485 use irc interface,no sleep
+//#define   MD_NO_LCD
 //#define   MD_TEMP		        //temp display line 2
-//#define   MD_HIGH
-#define   MD_IGNORE_ALL_ERR
+#define   MD_HIGH
+//#define   MD_IGNORE_ALL_ERR
 
 
 #define   MD_CH0_GAIN    (0<<2)
