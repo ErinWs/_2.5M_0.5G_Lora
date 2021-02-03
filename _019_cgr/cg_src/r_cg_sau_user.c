@@ -47,6 +47,7 @@ Includes
 #include "lora.h"
 #include "modbus.h"
 #include "device.h"
+#include "r_cg_intp.h"
 /* End user code. Do not edit comment generated here */
 #include "r_cg_userdefine.h"
 
@@ -327,7 +328,7 @@ static void r_uart2_callback_sendend(void)
     if(loraComps.work_st.mode==EM_RUN)
     {
 	    loraComps.op_window_time=0;
-            enter_cad_mode();
+        MD_LORA_INTP_ENABLE();
     }
     /* End user code. Do not edit comment generated here */
 }

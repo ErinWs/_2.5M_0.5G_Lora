@@ -66,15 +66,15 @@ __interrupt static void r_intc0_interrupt(void)
         if(loraComps.work_st.dir==EM_RECV)
         {
             loraComps.sw._bit.runing=1;
-            loraComps.op_window_time=6;
+            loraComps.op_window_time=200;
+            MD_LORA_EN_PIN_RESET;
             enable_lora();
             MD_LORA_INTP_DISABLE();
         }
-     //   else if(loraComps.work_st.dir==EM_SEND)
-     //   {
-      //      loraComps.sw._bit.runing=0;
-      //      disable_lora();
-      //  }
+        else if(loraComps.work_st.dir==EM_SEND)
+        {
+            enter_cad_mode();
+        }
     }
     //else
     //{

@@ -1366,7 +1366,7 @@ device_comps_t device_comps=
     0,//    unsigned long count;            //Called counter
 
 
-    {MD_E2PROM_DRIVER_ERR+MD_CS123X_DRIVER_ERR+MD_LORA_MODULE_ERR},  //union sw;  e2prom fault +cs123x err }, 
+    {MD_E2PROM_DRIVER_ERR+MD_CS123X_DRIVER_ERR},  //union sw;  e2prom fault +cs123x err }, 
     
    0, //int PHihgOverTimer;
    0,// int PHihgRealseTimer;

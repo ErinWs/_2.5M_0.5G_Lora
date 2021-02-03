@@ -1,5 +1,5 @@
-#ifndef HUM_H
-
+#ifndef   HUM_H
+#define   HUM_H
 #define   MD_09_PIN_LCD_SEG06   SEG6
 #define   MD_10_PIN_LCD_SEG07   SEG7
 #define   MD_11_PIN_LCD_SEG08   SEG8
