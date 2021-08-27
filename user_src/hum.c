@@ -1149,7 +1149,7 @@ static void lora_mode_on_m_key(void)
     {
         hum_comps.dis_oper_mark._bit.cur2=0;
     }
-    mode_comps[hum_comps.current_mode].displayTimer=-1;
+    mode_comps[hum_comps.current_mode].displayTimer=0;
 }
 
 static void lora_mode_on_long_m_key(void)

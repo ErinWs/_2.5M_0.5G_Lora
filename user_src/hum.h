@@ -122,7 +122,7 @@
 
 
 
-#define   MD_FL_VER                      3
+#define   MD_FL_VER                      5   //NO AUTO BACK LCD
 typedef enum  
 {
 	EM_NORMAL_MODE=0,
